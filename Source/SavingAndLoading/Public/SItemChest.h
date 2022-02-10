@@ -18,7 +18,7 @@ public:
 	float TargetPitch;
 
 	ASItemChest();
-	void Interact_Implementation(APawn* InstigatorPawn) override;
+	void Interact_Implementation(APawn* InstigatorPawdn) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere)
