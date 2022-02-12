@@ -8,6 +8,8 @@
 #include "SInteractionComponent.h"
 #include "Animation/AnimMontage.h"
 #include "SAttributeComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "../Private/KismetTraceUtils.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -23,7 +25,7 @@ ASCharacter::ASCharacter()
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->SetupAttachment(RootComponent);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
@@ -57,13 +59,35 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ASCharacter::PrimaryAttack()
 {
+	FVector2D ViewPortSize;
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewPortSize);
+	}
+
+	FVector2D CrosshairLocation(ViewPortSize.X / 2.f, ViewPortSize.Y / 2.f);
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
+
+	if (bScreenToWorld)
+	{
+		FHitResult ScreenTraceHit;
+		const FVector Start{ CrosshairWorldPosition };
+		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50000.f };
+
+		GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
+		DrawDebugLineTraceSingle(GetWorld(), Start, End, EDrawDebugTrace::ForDuration, true, ScreenTraceHit, FColor::Red, FColor::Green, 2.f);
+	}
+
 	PlayAnimMontage(AttackAnim);
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttackTimeElapsed, 0.2f);
 }
 	
 void ASCharacter::PrimaryAttackTimeElapsed()
 {
-	
+
 	FVector HandLocation = GetMesh()->GetSocketLocation("muzzle_01");
 
 	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
