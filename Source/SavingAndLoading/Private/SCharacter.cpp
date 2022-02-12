@@ -59,6 +59,14 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ASCharacter::PrimaryAttack()
 {
+
+	PlayAnimMontage(AttackAnim);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttackTimeElapsed, 0.2f);
+}
+	
+void ASCharacter::PrimaryAttackTimeElapsed()
+{
+
 	FVector2D ViewPortSize;
 	if (GEngine && GEngine->GameViewport)
 	{
@@ -68,6 +76,7 @@ void ASCharacter::PrimaryAttack()
 	FVector2D CrosshairLocation(ViewPortSize.X / 2.f, ViewPortSize.Y / 2.f);
 	FVector CrosshairWorldPosition;
 	FVector CrosshairWorldDirection;
+	
 
 	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
 
@@ -76,27 +85,31 @@ void ASCharacter::PrimaryAttack()
 		FHitResult ScreenTraceHit;
 		const FVector Start{ CrosshairWorldPosition };
 		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50000.f };
+		
+		FVector HandLocation = GetMesh()->GetSocketLocation("muzzle_01");
+		FVector EndPoint{ End };
 
-		GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
+		GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, HandLocation, End, ECollisionChannel::ECC_Visibility);
 		DrawDebugLineTraceSingle(GetWorld(), Start, End, EDrawDebugTrace::ForDuration, true, ScreenTraceHit, FColor::Red, FColor::Green, 2.f);
+		if (ScreenTraceHit.bBlockingHit)
+		{
+			EndPoint = ScreenTraceHit.Location;
+		}
+
+		
+		
+
+		FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+		
+
+		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 	}
 
-	PlayAnimMontage(AttackAnim);
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttackTimeElapsed, 0.2f);
-}
 	
-void ASCharacter::PrimaryAttackTimeElapsed()
-{
-
-	FVector HandLocation = GetMesh()->GetSocketLocation("muzzle_01");
-
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this; 
-
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
 
 void ASCharacter::JumpStart()
