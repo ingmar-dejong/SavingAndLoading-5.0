@@ -24,7 +24,7 @@ AAMagicProjectile::AAMagicProjectile()
 	EffectComp->SetupAttachment(ShpereComp);
 
 	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
-	MovementComp->InitialSpeed = 2000.f;
+	MovementComp->InitialSpeed = 5000.f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
 

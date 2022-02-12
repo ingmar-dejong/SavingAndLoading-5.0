@@ -25,7 +25,7 @@ ASCharacter::ASCharacter()
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->SetupAttachment(RootComponent);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
@@ -67,7 +67,7 @@ void ASCharacter::PrimaryAttack()
 void ASCharacter::PrimaryAttackTimeElapsed()
 {
 
-	FVector2D ViewPortSize;
+	/*FVector2D ViewPortSize;
 	if (GEngine && GEngine->GameViewport)
 	{
 		GEngine->GameViewport->GetViewportSize(ViewPortSize);
@@ -90,7 +90,7 @@ void ASCharacter::PrimaryAttackTimeElapsed()
 		FVector EndPoint{ End };
 
 		GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, HandLocation, End, ECollisionChannel::ECC_Visibility);
-		DrawDebugLineTraceSingle(GetWorld(), Start, End, EDrawDebugTrace::ForDuration, true, ScreenTraceHit, FColor::Red, FColor::Green, 2.f);
+		DrawDebugLineTraceSingle(GetWorld(), HandLocation, End, EDrawDebugTrace::ForDuration, true, ScreenTraceHit, FColor::Red, FColor::Green, 2.f);
 		if (ScreenTraceHit.bBlockingHit)
 		{
 			EndPoint = ScreenTraceHit.Location;
@@ -99,17 +99,51 @@ void ASCharacter::PrimaryAttackTimeElapsed()
 		
 		
 
-		FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+		
+	}*/
+		SweepRadius = 20.f;
+		SweepDistanceFallback = 5000.f;
+
+		FVector HandLocation = GetMesh()->GetSocketLocation("muzzle_01");
+
+	
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.Instigator = this;
+
+		FCollisionShape Shape;
+		Shape.SetSphere(SweepRadius);
+
+		// Ignore Player
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		FVector TraceDirection = this->GetControlRotation().Vector();
+
+		// Add sweep radius onto start to avoid the sphere clipping into floor/walls the camera is directly against.
+		FVector TraceStart = this->GetPawnViewLocation() + (TraceDirection * SweepRadius);
+
+		// endpoint far into the look-at distance (not too far, still adjust somewhat towards crosshair on a miss)
+		FVector TraceEnd = TraceStart + (TraceDirection * SweepDistanceFallback);
 		
+		FHitResult Hit;
+		bool bBlockingHit = GetWorld()->SweepSingleByChannel(Hit, TraceStart, TraceEnd, FQuat::Identity, ECC_GameTraceChannel1, Shape, Params);
+		// returns true if we got to a blocking hit (Channel1="Projectile" defined in DefaultGame.ini)
+		if (bBlockingHit)
+		{
+			// Overwrite trace end with impact point in world
+			TraceEnd = Hit.ImpactPoint;
+		}
+		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, SweepRadius, 32, LineColor, false, 2.f);
 
+		// find new direction/rotation from Hand pointing to impact point in world.
+		FRotator ProjRotation = (TraceEnd - HandLocation).Rotation();
+
+		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
 		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
-	}
 
-	
 }
 
 void ASCharacter::JumpStart()

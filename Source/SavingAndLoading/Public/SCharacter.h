@@ -19,6 +19,13 @@ class SAVINGANDLOADING_API ASCharacter : public ACharacter
 	GENERATED_BODY()
 
 protected:
+
+	/* Fallback distance when sweep finds no collision under crosshair. Adjusts final projectile direction */
+	UPROPERTY(EditAnywhere, Category = "Targeting")
+	float SweepDistanceFallback;
+
+	UPROPERTY(EditAnywhere, Category = "Targeting")
+	float SweepRadius;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
