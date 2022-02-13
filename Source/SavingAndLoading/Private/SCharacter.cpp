@@ -32,12 +32,21 @@ ASCharacter::ASCharacter()
 
 }
 
+void ASCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
+}
+
+
 // Called when the game starts or when spawned
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
+
+
 
 // Called every frame
 void ASCharacter::Tick(float DeltaTime)
@@ -54,6 +63,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASCharacter::Jump);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ASCharacter::DashTeleport);
 
 }
 
@@ -66,7 +76,23 @@ void ASCharacter::PrimaryAttack()
 	
 void ASCharacter::PrimaryAttackTimeElapsed()
 {
+	SpawnProjectile(ProjectileClass);
+}
 
+void ASCharacter::DashTeleport()
+{
+	PlayAnimMontage(AttackAnim);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::DashTimeElapsed, 0.2f);
+}
+
+void ASCharacter::DashTimeElapsed()
+{
+	SpawnProjectile(DashProjectileClass);
+}
+
+
+void ASCharacter::SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn))
+{
 	FVector2D ViewPortSize;
 	if (GEngine && GEngine->GameViewport)
 	{
@@ -104,15 +130,9 @@ void ASCharacter::PrimaryAttackTimeElapsed()
 		FRotator ProjRotation = (EndPoint - HandLocation).Rotation();
 
 		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
-		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+		GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTM, SpawnParams);
 	}
 }
-
-	
-	
-	
-
-
 
 void ASCharacter::JumpStart()
 {
@@ -133,4 +153,13 @@ void ASCharacter::PrimaryInteract()
 	}
 
 }
+void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
+{
+	if (NewHealth<= 0.0f && Delta < 0.0f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+	}
+}
+
 

@@ -31,9 +31,13 @@ protected:
 	TSubclassOf<AActor> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> DashProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
+
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
@@ -51,17 +55,25 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void PostInitializeComponents() override;
+
 	void PrimaryAttack(); 
 	void JumpStart();
 	void JumpEnd();
 	void PrimaryInteract();
 	void PrimaryAttackTimeElapsed();
+	void DashTimeElapsed();
+	void SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn));
+	void DashTeleport();
 	
 	UPROPERTY(VisibleAnywhere)
 	USInteractionComponent* InteractionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
 public:	
 	// Called every frame

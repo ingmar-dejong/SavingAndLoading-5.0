@@ -24,6 +24,9 @@ protected:
 
 public:	
 
+	UFUNCTION(BlueprintCallable)
+	bool IsAlive();
+
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHeatlhChange(float Delta);
 

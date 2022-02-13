@@ -9,6 +9,11 @@ USAttributeComponent::USAttributeComponent()
 	Health = 100.f;
 }
 
+bool USAttributeComponent::IsAlive()
+{
+	return Health > 0.0f;
+}
+
 bool USAttributeComponent::ApplyHeatlhChange(float Delta)
 {
 	Health += Delta;
