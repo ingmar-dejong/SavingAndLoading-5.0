@@ -9,25 +9,21 @@
 
 
 
+
 // Sets default values
 AAMagicProjectile::AAMagicProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	SphereComp->SetSphereRadius(20.f);
+	InitialLifeSpan = 10.f;
+}
 
-	ShpereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	ShpereComp->SetCollisionProfileName("Projectile");
-	ShpereComp->OnComponentBeginOverlap.AddDynamic(this, &AAMagicProjectile::OnActorOverlap);
-	RootComponent = ShpereComp;
+void AAMagicProjectile::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 
-	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("ParctileSystemComponent");
-	EffectComp->SetupAttachment(ShpereComp);
-
-	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
-	MovementComp->InitialSpeed = 2000.f;
-	MovementComp->bRotationFollowsVelocity = true;
-	MovementComp->bInitialVelocityInLocalSpace = true;
-
+	// More consistent to bind here compared to Constructor which may fail to bind if Blueprint was created before adding this binding (or when using hotreload)
+	// PostInitializeComponent is the preferred way of binding any events.
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AAMagicProjectile::OnActorOverlap);
 }
 
 void AAMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -45,17 +41,4 @@ void AAMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 
 }
 
-// Called when the game starts or when spawned
-void AAMagicProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AAMagicProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 

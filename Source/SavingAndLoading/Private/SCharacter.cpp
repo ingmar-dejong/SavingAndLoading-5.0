@@ -90,7 +90,7 @@ void ASCharacter::PrimaryAttackTimeElapsed()
 		FVector EndPoint{ End };
 
 		GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
-		DrawDebugLineTraceSingle(GetWorld(), Start, End, EDrawDebugTrace::ForDuration, true, ScreenTraceHit, FColor::Red, FColor::Green, 2.f);
+		//DrawDebugLineTraceSingle(GetWorld(), Start, End, EDrawDebugTrace::ForDuration, true, ScreenTraceHit, FColor::Red, FColor::Green, 2.f);
 		if (ScreenTraceHit.bBlockingHit)
 		{
 			EndPoint = ScreenTraceHit.Location;
