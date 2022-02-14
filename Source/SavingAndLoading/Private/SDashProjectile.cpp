@@ -6,16 +6,27 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Sound/SoundCue.h"
+#include "Components/SphereComponent.h"
+#include "ProjectileBase.h"
 
 ASDashProjectile::ASDashProjectile()
 {
-	DetonateDelay = 0.2f;
-	TeleportDelay = 0.2f;
+	DetonateDelay = 0.3f;
+	TeleportDelay = 0.1f;
 	MovementComp->InitialSpeed = 6000.f;
+	SphereComp->SetSphereRadius(20.f);
+
 }
+
+void ASDashProjectile::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
 void ASDashProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	GetWorldTimerManager().SetTimer(TimerHandle_DelayedDetonate, this, &ASDashProjectile::Explode, DetonateDelay);
 }
 
@@ -36,14 +47,28 @@ void ASDashProjectile::Explode_Implementation()
 
 void ASDashProjectile::TeleportInstigator()
 {
-	AActor* ActorToTeleport = GetInstigator();
-	if (ensure(ActorToTeleport))
+	if (IsPendingKill())
 	{
-		ActorToTeleport->TeleportTo(GetActorLocation(), ActorToTeleport->GetActorRotation(), false, false);
+			AActor* ActorToTeleport = GetInstigator();
+			if (ensure(ActorToTeleport))
+			{
+				ActorToTeleport->TeleportTo(GetActorLocation(), ActorToTeleport->GetActorRotation(), false, false);
+			}
+
+			Destroy();
+		
 	}
+	else
+	{
+		AActor* ActorToTeleport = GetInstigator();
+		if (ensure(ActorToTeleport))
+		{
+			ActorToTeleport->TeleportTo(GetActorLocation(), ActorToTeleport->GetActorRotation(), false, false);
+		}
 
-	Destroy();
+		Destroy();
+	}
+	
 }
-
 
 

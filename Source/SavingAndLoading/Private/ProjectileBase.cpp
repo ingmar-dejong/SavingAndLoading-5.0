@@ -19,6 +19,9 @@ AProjectileBase::AProjectileBase()
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("ParctileSystemComponent");
 	EffectComp->SetupAttachment(RootComponent);
 
+	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+	AudioComp->SetupAttachment(RootComponent);
+
 	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
 	MovementComp->InitialSpeed = 2000.f;
 	MovementComp->bRotationFollowsVelocity = true;
@@ -38,6 +41,7 @@ void AProjectileBase::Explode_Implementation()
 	if (ensure(!IsPendingKill()))
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 
 		Destroy();
 	}

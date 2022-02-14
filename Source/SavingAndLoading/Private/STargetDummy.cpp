@@ -19,6 +19,7 @@ ASTargetDummy::ASTargetDummy()
 
 void ASTargetDummy::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
+
 }
 
 
