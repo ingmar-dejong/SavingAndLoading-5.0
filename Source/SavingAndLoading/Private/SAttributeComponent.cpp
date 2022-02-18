@@ -6,7 +6,8 @@
 // Sets default values for this component's properties
 USAttributeComponent::USAttributeComponent()
 {
-	Health = 100.f;
+	MaxHealth = 100.f;
+	Health = MaxHealth;
 }
 
 bool USAttributeComponent::IsAlive()
@@ -16,9 +17,14 @@ bool USAttributeComponent::IsAlive()
 
 bool USAttributeComponent::ApplyHeatlhChange(float Delta)
 {
-	Health += Delta;
+	float OldHealth = Health;
+	float NewHealth = FMath::Clamp(Health + Delta, 0.f, MaxHealth);
+	float ActualDelta = NewHealth - OldHealth;
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+	Health = NewHealth;
+
+	OnHealthChanged.Broadcast(nullptr, this, Health, ActualDelta);
+	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
 
 	return true;
 }
