@@ -20,4 +20,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TSubclassOf<AActor> ClassToSpawn;
+
+public:
+	USBTTask_RangedAttack();
 };

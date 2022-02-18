@@ -18,7 +18,7 @@ bool USAttributeComponent::IsAlive()
 bool USAttributeComponent::ApplyHeatlhChange(float Delta)
 {
 	float OldHealth = Health;
-	float NewHealth = FMath::Clamp(Health + Delta, 0.f, MaxHealth);
+	float NewHealth = FMath::Clamp(Health + Delta, 0.0f, MaxHealth);
 	float ActualDelta = NewHealth - OldHealth;
 
 	Health = NewHealth;
