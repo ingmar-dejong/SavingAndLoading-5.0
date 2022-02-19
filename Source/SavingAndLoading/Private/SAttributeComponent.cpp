@@ -15,6 +15,11 @@ bool USAttributeComponent::IsAlive()
 	return Health > 0.0f;
 }
 
+bool USAttributeComponent::IsFullHealth()
+{
+	return Health == MaxHealth;
+}
+
 bool USAttributeComponent::ApplyHeatlhChange(float Delta)
 {
 	float OldHealth = Health;
@@ -29,4 +34,13 @@ bool USAttributeComponent::ApplyHeatlhChange(float Delta)
 	return true;
 }
 
+float USAttributeComponent::GetMaxHealth()
+{
+	return MaxHealth;
+}
+
+float USAttributeComponent::GetHealth()
+{
+	return Health;
+}
 

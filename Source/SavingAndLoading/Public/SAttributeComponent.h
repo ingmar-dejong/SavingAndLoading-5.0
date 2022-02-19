@@ -30,8 +30,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive();
 
+	UFUNCTION(BlueprintCallable)
+	bool IsFullHealth();
+
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHeatlhChange(float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetMaxHealth();
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetHealth();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
