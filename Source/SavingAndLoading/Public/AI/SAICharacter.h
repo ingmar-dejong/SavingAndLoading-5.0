@@ -7,6 +7,7 @@
 #include "SAICharacter.generated.h"
 
 class UPawnSensingComponent;
+class USAttributeComponent;
 
 UCLASS()
 class SAVINGANDLOADING_API ASAICharacter : public ACharacter
@@ -23,6 +24,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComponent; 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,  Category = "Components")
+	USAttributeComponent* AttributeComponent;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn); 

@@ -9,6 +9,7 @@
 
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
+class UCurveFloat;
 
 UCLASS()
 class SAVINGANDLOADING_API ASGameModeBase : public AGameModeBase
@@ -24,6 +25,9 @@ protected:
 	UEnvQuery* SpawnBotQuery;
 
 	FTimerHandle TimerHandle_SpawnBots;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UCurveFloat* DifficultyCurve; 
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float SpawnTimerInterval; 

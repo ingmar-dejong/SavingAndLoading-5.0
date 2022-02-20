@@ -5,6 +5,9 @@
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
+#include "AI/SAICharacter.h"
+#include "SAttributeComponent.h"
+#include "EngineUtils.h"
 
 ASGameModeBase::ASGameModeBase()
 {
@@ -15,7 +18,7 @@ void ASGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
+	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true); // After 2 seconds run SpawnBotTimerElapsed()
 }
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
@@ -35,11 +38,40 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 		UE_LOG(LogTemp, Warning, TEXT("Spawn Bot EQS Query Failed"));
 	}
 
+	int32 NrOfAliveAI = 0; 
+	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It)
+	{
+		ASAICharacter* Bot = *It;
+
+		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(Bot->GetComponentByClass(USAttributeComponent::StaticClass()));
+		if (ensure(AttributeComp && AttributeComp->IsAlive()))
+		{
+			NrOfAliveAI++;
+		}
+
+	}
+
+	float MaxBotCount = 10.f; 
+	if (DifficultyCurve)
+	{
+		MaxBotCount = DifficultyCurve->GetFloatValue(GetWorld()->TimeSeconds);
+	}
+
+
+	if (NrOfAliveAI >= MaxBotCount)
+	{
+		return; 
+	}
+
+	
+
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
 	if (Locations.Num() > 0) // of gebruik IsValidIndex(0)
 	{
-		GetWorld()->SpawnActor<AActor>(Minionclass, Locations[0], FRotator::ZeroRotator);
+		GetWorld()->SpawnActor<AActor>(Minionclass, Locations[0], FRotator::ZeroRotator, SpawnParams);
 	}
 }
 
