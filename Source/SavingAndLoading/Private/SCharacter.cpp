@@ -91,7 +91,7 @@ void ASCharacter::DashTimeElapsed()
 }
 
 
-void ASCharacter::SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn))
+FTransform ASCharacter::GetLookDirection()
 {
 	FVector2D ViewPortSize;
 	if (GEngine && GEngine->GameViewport)
@@ -102,7 +102,7 @@ void ASCharacter::SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn))
 	FVector2D CrosshairLocation(ViewPortSize.X / 2.f, ViewPortSize.Y / 2.f);
 	FVector CrosshairWorldPosition;
 	FVector CrosshairWorldDirection;
-
+	FTransform SpawnTM;
 
 	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
 
@@ -122,16 +122,26 @@ void ASCharacter::SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn))
 			EndPoint = ScreenTraceHit.Location;
 		}
 
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
 		//find new direction/rotation from Hand pointing to impact point in world.
 		FRotator ProjRotation = (EndPoint - HandLocation).Rotation();
 
-		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
-		GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTM, SpawnParams);
+		SpawnTM = FTransform(ProjRotation, HandLocation);
+
+		
 	}
+	return SpawnTM;
+}
+
+
+
+void ASCharacter::SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn))
+{
+	FTransform GetLookDir = GetLookDirection();
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
+	GetWorld()->SpawnActor<AActor>(ClassToSpawn, GetLookDir, SpawnParams);
 }
 
 void ASCharacter::JumpStart()

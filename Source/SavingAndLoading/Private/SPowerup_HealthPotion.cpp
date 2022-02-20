@@ -21,6 +21,11 @@ ASPowerup_HealthPotion::ASPowerup_HealthPotion()
 
 
 
+void ASPowerup_HealthPotion::HideAndShowPowerUp()
+{
+
+}
+
 void ASPowerup_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
 	if (!ensure(InstigatorPawn))

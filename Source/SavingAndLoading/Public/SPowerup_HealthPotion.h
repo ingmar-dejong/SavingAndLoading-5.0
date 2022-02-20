@@ -21,6 +21,8 @@ public:
 
 	void Interact_Implementation(APawn* InstigatorPawn) override;
 
+	void HideAndShowPowerUp();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

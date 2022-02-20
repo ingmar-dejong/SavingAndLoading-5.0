@@ -50,7 +50,7 @@ protected:
 public:
 	// Sets default values for this character's properties
 	ASCharacter();
-
+	FTransform GetLookDirection();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -65,6 +65,8 @@ protected:
 	void DashTimeElapsed();
 	void SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn));
 	void DashTeleport();
+
+	
 	
 	UPROPERTY(VisibleAnywhere)
 	USInteractionComponent* InteractionComp;
@@ -74,6 +76,8 @@ protected:
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
+
+
 
 public:	
 	// Called every frame

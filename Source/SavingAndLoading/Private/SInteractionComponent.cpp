@@ -4,6 +4,8 @@
 #include "SInteractionComponent.h"
 #include "SGameplayInterface.h"
 #include "DrawDebugHelpers.h"
+#include "SCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 USInteractionComponent::USInteractionComponent()
@@ -36,51 +38,100 @@ void USInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void USInteractionComponent::PrimaryInteract()
 {
-	FCollisionObjectQueryParams ObjectQeuryParams;
-	ObjectQeuryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
-	AActor* MyOwner = GetOwner();
-
-
-
-	FVector EyeLocation;
-	FRotator EyeRotation;
-	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-
-	FVector End = EyeLocation + (EyeRotation.Vector() * 1000);
-
-
-	//FHitResult Hit;
-	//bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQeuryParams);
-
-	TArray<FHitResult> Hits;
-	float Radius = 30.f;
-	FCollisionShape Shape;
-	Shape.SetSphere(Radius);
-
-	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQeuryParams, Shape);
-	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-
-	for (FHitResult Hit : Hits)
+	FVector2D ViewPortSize;
+	if (GEngine && GEngine->GameViewport)
 	{
-		AActor* HitActor = Hit.GetActor();
-		if (HitActor)
-		{
-			if (HitActor->Implements<USGameplayInterface>()) // Hier "U " prefix omdat checkt of de hele Interface bestaat
-			{
-				APawn* MyPawn = Cast<APawn>(MyOwner);
-				ISGameplayInterface::Execute_Interact(HitActor, MyPawn); // "I" prefix omdat je cast naar het level?
-				break;
-			}
-
-		}
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
+		GEngine->GameViewport->GetViewportSize(ViewPortSize);
 	}
 
+	FVector2D CrosshairLocation(ViewPortSize.X / 2.f, ViewPortSize.Y / 2.f);
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+	FTransform SpawnTM;
+
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
+	if (bScreenToWorld)
+	{
+		AActor* MyOwner = GetOwner();
+		FHitResult ScreenTraceHit;
+		const FVector Start{ CrosshairWorldPosition };
+		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 500.f };
+		
+		FVector EndPoint{ End };
+
+		TArray<FHitResult> Hits;
+		float Radius = 30.f;
+		FCollisionShape Shape;
+		Shape.SetSphere(Radius);
+		
+		FCollisionObjectQueryParams ObjectQeuryParams;
+		ObjectQeuryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+
+		bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, Start, End, FQuat::Identity, ObjectQeuryParams, Shape);
+		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+
+		for (FHitResult Hit : Hits)
+		{
+			AActor* HitActor = Hit.GetActor();
+			if (HitActor)
+			{
+				if (HitActor->Implements<USGameplayInterface>()) // Hier "U " prefix omdat checkt of de hele Interface bestaat
+				{
+					APawn* MyPawn = Cast<APawn>(MyOwner);
+					ISGameplayInterface::Execute_Interact(HitActor, MyPawn); // "I" prefix omdat je cast naar het level?
+					break;
+				}
+
+			}
+			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
+		}
 
 
 
-	DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.f, 0, 2.f);
+	}
+	
+
+// 	AActor* MyOwner = GetOwner();
+// 	
+// 	FVector EyeLocation;
+// 	FRotator EyeRotation;
+// 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+// 
+// 	FVector End = EyeLocation + (EyeRotation.Vector() * 1000);
+// 
+// 
+// 	//FHitResult Hit;
+// 	//bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQeuryParams);
+// 
+// 	TArray<FHitResult> Hits;
+// 	float Radius = 30.f;
+// 	FCollisionShape Shape;
+// 	Shape.SetSphere(Radius);
+// 
+// 	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQeuryParams, Shape);
+// 	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+// 
+// 	for (FHitResult Hit : Hits)
+// 	{
+// 		AActor* HitActor = Hit.GetActor();
+// 		if (HitActor)
+// 		{
+// 			if (HitActor->Implements<USGameplayInterface>()) // Hier "U " prefix omdat checkt of de hele Interface bestaat
+// 			{
+// 				APawn* MyPawn = Cast<APawn>(MyOwner);
+// 				ISGameplayInterface::Execute_Interact(HitActor, MyPawn); // "I" prefix omdat je cast naar het level?
+// 				break;
+// 			}
+// 
+// 		}
+// 		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
+// 	}
+// 
+// 
+// 
+// 
+// 	DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.f, 0, 2.f);
 
 
 }
