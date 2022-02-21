@@ -7,6 +7,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
 #include "SAttributeComponent.h"
+#include "BrainComponent.h"
+
 
 // Sets default values
 ASAICharacter::ASAICharacter()
@@ -21,18 +23,52 @@ ASAICharacter::ASAICharacter()
 void ASAICharacter::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
+    AttributeComponent->OnHealthChanged.AddDynamic(this, &ASAICharacter::OnHealthChanged);
     PawnSensingComponent->OnSeePawn.AddDynamic(this, &ASAICharacter::OnPawnSeen);
 }
 
-void ASAICharacter::OnPawnSeen(APawn* Pawn)
-{
-    AAIController* AIC = Cast<AAIController>(GetController());
-    if (AIC)
-    {
-        UBlackboardComponent* BBComp = AIC->GetBlackboardComponent();
 
-        BBComp->SetValueAsObject("TargetActor", Pawn);
-        DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.f, true);
+void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
+{
+    if (Delta < 0.f)
+    {
+        if (InstigatorActor != this) // Not checking if its not another AI, so they can aggro eachother 
+        {
+            SetTargetActor(InstigatorActor);
+        }
+
+        if (NewHealth <= 0)
+        {
+            // Stop BT
+            AAIController* AIC = Cast<AAIController>(GetController());
+            if (AIC)
+            {
+                AIC->GetBrainComponent()->StopLogic("AI Killed"); 
+            }
+
+            // Raddoll
+            GetMesh()->SetAllBodiesSimulatePhysics(true);
+            GetMesh()->SetCollisionProfileName("Ragdoll");
+
+            // Set LifeSpawn
+            SetLifeSpan(10.f);
+        }
     }
 }
 
+void ASAICharacter::SetTargetActor(AActor* NewTarget)
+{
+	AAIController* AIC = Cast<AAIController>(GetController());
+    if (AIC)
+    {
+       AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
+    }
+}
+
+
+void ASAICharacter::OnPawnSeen(APawn* Pawn)
+{
+    SetTargetActor(Pawn);
+    DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.f, true);
+   
+}

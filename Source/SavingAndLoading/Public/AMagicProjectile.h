@@ -24,4 +24,6 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	float DamageAmount;
 };

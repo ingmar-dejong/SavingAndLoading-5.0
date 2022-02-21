@@ -35,7 +35,7 @@ void ASPowerup_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
 	if (ensure(AttributeComp)&& !AttributeComp->IsFullHealth())
 	{
-		AttributeComp->ApplyHeatlhChange(AttributeComp->GetMaxHealth());
+		AttributeComp->ApplyHeatlhChange(this, AttributeComp->GetMaxHealth());
 		Destroy();
 	}
 

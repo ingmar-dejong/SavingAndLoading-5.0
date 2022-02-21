@@ -14,6 +14,13 @@ class SAVINGANDLOADING_API USAttributeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	static USAttributeComponent* GetAttributes(AActor* FromActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes", meta = (DisplayName = "IsAlive"))
+	static bool IsActorAlive(AActor* Actor);
+
 	// Sets default values for this component's properties
 	USAttributeComponent();
 
@@ -34,7 +41,7 @@ public:
 	bool IsFullHealth();
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHeatlhChange(float Delta);
+	bool ApplyHeatlhChange(AActor* InstigatorActor, float Delta);
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	float GetMaxHealth();

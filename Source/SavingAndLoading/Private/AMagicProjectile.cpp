@@ -15,6 +15,7 @@ AAMagicProjectile::AAMagicProjectile()
 {
 	SphereComp->SetSphereRadius(20.f);
 	InitialLifeSpan = 10.f;
+	DamageAmount = 20.f;
 }
 
 void AAMagicProjectile::PostInitializeComponents()
@@ -33,7 +34,7 @@ void AAMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHeatlhChange(-20.f);
+			AttributeComp->ApplyHeatlhChange(GetInstigator(), -DamageAmount);
 
 			Destroy();
 		}
