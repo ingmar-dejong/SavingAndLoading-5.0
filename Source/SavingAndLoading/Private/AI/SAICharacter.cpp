@@ -28,6 +28,7 @@ void ASAICharacter::PostInitializeComponents()
     Super::PostInitializeComponents();
     AttributeComponent->OnHealthChanged.AddDynamic(this, &ASAICharacter::OnHealthChanged);
     PawnSensingComponent->OnSeePawn.AddDynamic(this, &ASAICharacter::OnPawnSeen);
+
 }
 
 
@@ -40,12 +41,15 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
             SetTargetActor(InstigatorActor);
         }
 
-        ActiveHealthBar =  CreateWidget<USWorldUserWidget>(this, HealthBarWidgetClass);
-        if (ActiveHealthBar)
+        if (ActiveHealthBar == nullptr)
         {
-            ActiveHealthBar->AddToViewport();
+			ActiveHealthBar = CreateWidget<USWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+			if (ActiveHealthBar)
+			{
+                ActiveHealthBar->AttachedActor = this;
+				ActiveHealthBar->AddToViewport();
+			}
         }
-
 
         GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParaName, GetWorld()->TimeSeconds);
 

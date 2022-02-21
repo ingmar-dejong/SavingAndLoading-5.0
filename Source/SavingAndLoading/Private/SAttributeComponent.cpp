@@ -12,24 +12,24 @@ USAttributeComponent::USAttributeComponent()
 	Health = MaxHealth;
 }
 
-bool USAttributeComponent::IsAlive()
+bool USAttributeComponent::IsAlive() const
 {
 	return Health > 0.0f;
 }
 
-bool USAttributeComponent::IsFullHealth()
+bool USAttributeComponent::IsFullHealth() const
 {
 	return Health == MaxHealth;
 }
 
 
 
-float USAttributeComponent::GetMaxHealth()
+float USAttributeComponent::GetMaxHealth() const
 {
 	return MaxHealth;
 }
 
-float USAttributeComponent::GetHealth()
+float USAttributeComponent::GetHealth() const
 {
 	return Health;
 }

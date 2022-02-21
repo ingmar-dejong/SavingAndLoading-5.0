@@ -10,8 +10,15 @@ void USWorldUserWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	if (!IsValid(AttachedActor))
+	{
+		RemoveFromParent();
+		UE_LOG(LogTemp, Warning, TEXT("AttachedActor no longer valid, removing Health Widget."));
+		return;
+	}
+
 	FVector2D ScreenPosistion;
-	if (UGameplayStatics::ProjectWorldToScreen(GetOwningPlayer(), AttachedActor->GetActorLocation(), ScreenPosistion))
+	if (UGameplayStatics::ProjectWorldToScreen(GetOwningPlayer(), AttachedActor->GetActorLocation() + WorldOffset, ScreenPosistion))
 	{
 		float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
 
