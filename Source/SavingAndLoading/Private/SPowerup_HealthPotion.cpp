@@ -41,8 +41,8 @@ void ASPowerup_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 
 
 }
-
 // Called when the game starts or when spawned
+
 void ASPowerup_HealthPotion::BeginPlay()
 {
 	Super::BeginPlay();

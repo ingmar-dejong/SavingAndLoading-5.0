@@ -20,6 +20,9 @@ class SAVINGANDLOADING_API ASCharacter : public ACharacter
 
 protected:
 
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParaName;
+
 	/* Fallback distance when sweep finds no collision under crosshair. Adjusts final projectile direction */
 	UPROPERTY(EditAnywhere, Category = "Targeting")
 	float SweepDistanceFallback;
