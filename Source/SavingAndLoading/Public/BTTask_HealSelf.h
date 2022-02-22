@@ -4,27 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-
-#include "SBTTask_RangedAttack.generated.h"
+#include "BTTask_HealSelf.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SAVINGANDLOADING_API USBTTask_RangedAttack : public UBTTaskNode
+class SAVINGANDLOADING_API UBTTask_HealSelf : public UBTTaskNode
 {
 	GENERATED_BODY()
-
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 protected:
+	
 
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float MaxBulletSpread; 
-
-	UPROPERTY(EditAnywhere, Category = "AI")
-	TSubclassOf<AActor> ClassToSpawn;
-
-public:
-	USBTTask_RangedAttack();
+	
 };
