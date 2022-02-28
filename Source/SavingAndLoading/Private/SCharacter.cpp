@@ -10,6 +10,9 @@
 #include "SAttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Private/KismetTraceUtils.h"
+#include "SActionComponent.h"
+
+static TAutoConsoleVariable<bool> CVarDebugDrawProjectile(TEXT("su.ProjectileDebugDraw"), false, TEXT("Enable Debug Lines for Projectile Component"), ECVF_Cheat);
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -20,6 +23,8 @@ ASCharacter::ASCharacter()
 	InteractionComp = CreateDefaultSubobject<USInteractionComponent>(TEXT("InteractionComponent"));
 
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>(TEXT("AttributeComponent"));
+
+	ActionComp = CreateDefaultSubobject<USActionComponent>(TEXT("ActionComponent"));
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
 	SpringArmComp->bUsePawnControlRotation = true;
@@ -39,6 +44,7 @@ void ASCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
+
 
 
 // Called when the game starts or when spawned
@@ -67,6 +73,14 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ASCharacter::DashTeleport);
 
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASCharacter::SprintStop);
+
+}
+
+void ASCharacter::HealSelf(float Amount)
+{
+	AttributeComp->ApplyHeatlhChange(this, Amount);
 }
 
 void ASCharacter::PrimaryAttack()
@@ -95,6 +109,9 @@ void ASCharacter::DashTimeElapsed()
 
 FTransform ASCharacter::GetLookDirection()
 {
+
+	bool bDebugDraw = CVarDebugDrawProjectile.GetValueOnGameThread();
+
 	FVector2D ViewPortSize;
 	if (GEngine && GEngine->GameViewport)
 	{
@@ -117,12 +134,37 @@ FTransform ASCharacter::GetLookDirection()
 		FVector HandLocation = GetMesh()->GetSocketLocation("muzzle_01");
 		FVector EndPoint{ End };
 
-		GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
-		//DrawDebugLineTraceSingle(GetWorld(), Start, End, EDrawDebugTrace::ForDuration, true, ScreenTraceHit, FColor::Red, FColor::Green, 2.f);
-		if (ScreenTraceHit.bBlockingHit)
+	
+		TArray<FHitResult> Hits;
+		float Radius = 30.f;
+		FCollisionShape Shape;
+		Shape.SetSphere(Radius);
+		bool bBlockingHit = GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity, ECC_Visibility, Shape);   //(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
+		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+
+
+		
+		for (FHitResult Hit : Hits)
 		{
-			EndPoint = ScreenTraceHit.Location;
+			if (bDebugDraw)
+			{
+				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
+			}
+			
+			AActor* HitActor = Hit.GetActor();
+			if (HitActor != this)
+			{
+					if (HitActor)
+					{
+						EndPoint = Hit.Location;
+					}
+			}
+			
+
+			//EndPoint = ScreenTraceHit.Location;
 		}
+
+	
 
 		//find new direction/rotation from Hand pointing to impact point in world.
 		FRotator ProjRotation = (EndPoint - HandLocation).Rotation();
@@ -139,7 +181,6 @@ FTransform ASCharacter::GetLookDirection()
 void ASCharacter::SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn))
 {
 	FTransform GetLookDir = GetLookDirection();
-	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
@@ -179,4 +220,13 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 	}
 }
 
+void ASCharacter::SprintStart()
+{
+	ActionComp->StartActionByName(this, "Sprint");
+}
+
+void ASCharacter::SprintStop()
+{
+	ActionComp->StopActionByName(this, "Sprint");
+}
 

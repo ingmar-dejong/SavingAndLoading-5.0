@@ -7,6 +7,8 @@
 #include "SCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
+static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("su.InteractionDebugDraw"), false, TEXT("Enable Debug Lines for Interact Component"), ECVF_Cheat);
+
 // Sets default values for this component's properties
 USInteractionComponent::USInteractionComponent()
 {
@@ -38,6 +40,8 @@ void USInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void USInteractionComponent::PrimaryInteract()
 {
+	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
+
 
 	FVector2D ViewPortSize;
 	if (GEngine && GEngine->GameViewport)
@@ -56,7 +60,7 @@ void USInteractionComponent::PrimaryInteract()
 		AActor* MyOwner = GetOwner();
 		FHitResult ScreenTraceHit;
 		const FVector Start{ CrosshairWorldPosition };
-		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 500.f };
+		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 800.f };
 		
 		FVector EndPoint{ End };
 
@@ -73,6 +77,11 @@ void USInteractionComponent::PrimaryInteract()
 
 		for (FHitResult Hit : Hits)
 		{
+			if (bDebugDraw)
+			{
+				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
+			}
+
 			AActor* HitActor = Hit.GetActor();
 			if (HitActor)
 			{
@@ -84,7 +93,12 @@ void USInteractionComponent::PrimaryInteract()
 				}
 
 			}
-			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
+			
+		}
+
+		if (bDebugDraw)
+		{
+			DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.f, 0, 2.f);
 		}
 
 

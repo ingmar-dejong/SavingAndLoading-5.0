@@ -12,6 +12,7 @@ class USpringArmComponent;
 class USInteractionComponent;
 class UAnimMontage;
 class USAttributeComponent;
+class USActionComponent;
 
 UCLASS()
 class SAVINGANDLOADING_API ASCharacter : public ACharacter
@@ -60,6 +61,8 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
+	void SprintStart();
+	void SprintStop();
 	void PrimaryAttack(); 
 	void JumpStart();
 	void JumpEnd();
@@ -77,6 +80,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USActionComponent* ActionComp;
+
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
@@ -88,5 +94,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 100.f);
 
 };
