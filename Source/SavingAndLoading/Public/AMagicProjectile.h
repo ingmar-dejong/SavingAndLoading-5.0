@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProjectileBase.h"
+#include "GameplayTagContainer.h"
 #include "AMagicProjectile.generated.h"
 
 
@@ -21,6 +22,9 @@ public:
 protected:
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Tags")
+	FGameplayTag ParryTag;
 
 	virtual void PostInitializeComponents() override;
 

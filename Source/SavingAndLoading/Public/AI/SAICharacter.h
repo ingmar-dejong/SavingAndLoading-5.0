@@ -9,6 +9,7 @@
 class UPawnSensingComponent;
 class USAttributeComponent;
 class UUserWidget; 
+class USActionComponent;
 class USWorldUserWidget;
 
 UCLASS()
@@ -39,6 +40,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,  Category = "Components")
 	USAttributeComponent* AttributeComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USActionComponent* ActionComp;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn); 

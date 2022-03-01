@@ -12,6 +12,7 @@
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "SActionComponent.h"
 
 
 // Sets default values
@@ -20,6 +21,8 @@ ASAICharacter::ASAICharacter()
     PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 
     AttributeComponent = CreateDefaultSubobject<USAttributeComponent>(TEXT("AttributeComponent"));
+
+    ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComponent");
 
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 

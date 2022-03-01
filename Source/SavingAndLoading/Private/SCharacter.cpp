@@ -85,107 +85,15 @@ void ASCharacter::HealSelf(float Amount)
 
 void ASCharacter::PrimaryAttack()
 {
+	ActionComp->StartActionByName(this, "PrimaryAttack");
+}
 
-	PlayAnimMontage(AttackAnim);
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttackTimeElapsed, 0.2f);
-}
-	
-void ASCharacter::PrimaryAttackTimeElapsed()
-{
-	SpawnProjectile(ProjectileClass);
-}
 
 void ASCharacter::DashTeleport()
 {
-	PlayAnimMontage(AttackAnim);
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::DashTimeElapsed, 0.2f);
+	ActionComp->StartActionByName(this, "DashAttack");
 }
 
-void ASCharacter::DashTimeElapsed()
-{
-	SpawnProjectile(DashProjectileClass);
-}
-
-
-FTransform ASCharacter::GetLookDirection()
-{
-
-	bool bDebugDraw = CVarDebugDrawProjectile.GetValueOnGameThread();
-
-	FVector2D ViewPortSize;
-	if (GEngine && GEngine->GameViewport)
-	{
-		GEngine->GameViewport->GetViewportSize(ViewPortSize);
-	}
-
-	FVector2D CrosshairLocation(ViewPortSize.X / 2.f, ViewPortSize.Y / 2.f);
-	FVector CrosshairWorldPosition;
-	FVector CrosshairWorldDirection;
-	FTransform SpawnTM;
-
-	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
-
-	if (bScreenToWorld)
-	{
-		FHitResult ScreenTraceHit;
-		const FVector Start{ CrosshairWorldPosition };
-		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 10000.f };
-
-		FVector HandLocation = GetMesh()->GetSocketLocation("muzzle_01");
-		FVector EndPoint{ End };
-
-	
-		TArray<FHitResult> Hits;
-		float Radius = 30.f;
-		FCollisionShape Shape;
-		Shape.SetSphere(Radius);
-		bool bBlockingHit = GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity, ECC_Visibility, Shape);   //(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
-		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-
-
-		
-		for (FHitResult Hit : Hits)
-		{
-			if (bDebugDraw)
-			{
-				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
-			}
-			
-			AActor* HitActor = Hit.GetActor();
-			if (HitActor != this)
-			{
-					if (HitActor)
-					{
-						EndPoint = Hit.Location;
-					}
-			}
-			
-
-			//EndPoint = ScreenTraceHit.Location;
-		}
-
-	
-
-		//find new direction/rotation from Hand pointing to impact point in world.
-		FRotator ProjRotation = (EndPoint - HandLocation).Rotation();
-
-		SpawnTM = FTransform(ProjRotation, HandLocation);
-
-		
-	}
-	return SpawnTM;
-}
-
-
-
-void ASCharacter::SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn))
-{
-	FTransform GetLookDir = GetLookDirection();
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-	GetWorld()->SpawnActor<AActor>(ClassToSpawn, GetLookDir, SpawnParams);
-}
 
 void ASCharacter::JumpStart()
 {

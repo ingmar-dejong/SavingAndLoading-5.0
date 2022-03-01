@@ -30,18 +30,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Targeting")
 	float SweepRadius;
-	
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> DashProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	UAnimMontage* AttackAnim;
-
-	FTimerHandle TimerHandle_PrimaryAttack;
-
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
@@ -54,7 +42,6 @@ protected:
 public:
 	// Sets default values for this character's properties
 	ASCharacter();
-	FTransform GetLookDirection();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -67,9 +54,6 @@ protected:
 	void JumpStart();
 	void JumpEnd();
 	void PrimaryInteract();
-	void PrimaryAttackTimeElapsed();
-	void DashTimeElapsed();
-	void SpawnProjectile(TSubclassOf<AActor>(ClassToSpawn));
 	void DashTeleport();
 
 	
