@@ -9,39 +9,10 @@
 // Sets default values
 ASPowerup_HealthPotion::ASPowerup_HealthPotion()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-	HealthPotion = CreateDefaultSubobject<UStaticMeshComponent>("Health Potion Mesh");
-	RootComponent = HealthPotion;
-
-	SphereComp = CreateDefaultSubobject<USphereComponent>("Sphere Component");
-	SphereComp->SetupAttachment(HealthPotion);
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComp->SetupAttachment(RootComponent);
 }
-
-
-
-void ASPowerup_HealthPotion::HideAndShowPowerUp()
-{
-
-}
-
-void ASPowerup_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
-{
-	if (!ensure(InstigatorPawn))
-	{
-		return;
-	}
-	USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
-	if (ensure(AttributeComp)&& !AttributeComp->IsFullHealth())
-	{
-		AttributeComp->ApplyHeatlhChange(this, AttributeComp->GetMaxHealth());
-		Destroy();
-	}
-
-
-}
-// Called when the game starts or when spawned
 
 void ASPowerup_HealthPotion::BeginPlay()
 {
