@@ -69,9 +69,7 @@ void USAction_ProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCharac
 		Shape.SetSphere(Radius);
 		bool bBlockingHit = GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity, ECC_Visibility, Shape);   //(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
 		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-
-
-
+		
 		for (FHitResult Hit : Hits)
 		{
 			AActor* HitActor = Hit.GetActor();

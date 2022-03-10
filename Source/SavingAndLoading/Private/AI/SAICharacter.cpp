@@ -13,6 +13,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SActionComponent.h"
+#include "SPhysicalAnimationComponent.h"
 
 
 // Sets default values
@@ -23,6 +24,8 @@ ASAICharacter::ASAICharacter()
     AttributeComponent = CreateDefaultSubobject<USAttributeComponent>(TEXT("AttributeComponent"));
 
     ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComponent");
+
+    PhysAnimComp = CreateDefaultSubobject<USPhysicalAnimationComponent>(TEXT("Physical Animation Component"));
 
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 

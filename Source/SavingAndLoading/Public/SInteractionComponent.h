@@ -19,13 +19,21 @@ public:
 	// Sets default values for this component's properties
 	USInteractionComponent();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Get")
+	FHitResult HitResultAttack;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Get")
+	FHitResult GetHitResult() const;
 
 		
 };

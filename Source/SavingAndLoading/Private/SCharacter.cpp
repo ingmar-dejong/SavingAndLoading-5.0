@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "../Private/KismetTraceUtils.h"
 #include "SActionComponent.h"
+#include "SPhysicalAnimationComponent.h"
 
 static TAutoConsoleVariable<bool> CVarDebugDrawProjectile(TEXT("su.ProjectileDebugDraw"), false, TEXT("Enable Debug Lines for Projectile Component"), ECVF_Cheat);
 
@@ -23,7 +24,7 @@ ASCharacter::ASCharacter()
 	InteractionComp = CreateDefaultSubobject<USInteractionComponent>(TEXT("InteractionComponent"));
 
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>(TEXT("AttributeComponent"));
-
+	PhysAnimComp = CreateDefaultSubobject<USPhysicalAnimationComponent>(TEXT("PhysicalAnimComponent"));
 	ActionComp = CreateDefaultSubobject<USActionComponent>(TEXT("ActionComponent"));
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");

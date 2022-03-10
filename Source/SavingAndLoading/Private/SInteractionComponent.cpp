@@ -15,8 +15,7 @@ USInteractionComponent::USInteractionComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	
 }
 
 
@@ -36,6 +35,11 @@ void USInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+FHitResult USInteractionComponent::GetHitResult() const
+{
+	return HitResultAttack;
 }
 
 void USInteractionComponent::PrimaryInteract()
@@ -73,6 +77,8 @@ void USInteractionComponent::PrimaryInteract()
 		ObjectQeuryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
 		bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, Start, End, FQuat::Identity, ObjectQeuryParams, Shape);
+		GetWorld()->LineTraceSingleByObjectType(HitResultAttack, Start, End, ObjectQeuryParams);
+		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f, 1.f);
 		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
 
 		for (FHitResult Hit : Hits)

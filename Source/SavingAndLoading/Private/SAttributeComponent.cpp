@@ -3,6 +3,9 @@
 
 #include "SAttributeComponent.h"
 #include "SGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+#include "GameFramework/Character.h"
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplier"), true, TEXT("Global Damage Modifier for Attribute Component"), ECVF_Cheat);
 
@@ -40,7 +43,7 @@ float USAttributeComponent::GetHealth() const
 	return Health;
 }
 
-bool USAttributeComponent::ApplyHeatlhChange(AActor* InstigatorActor ,float Delta)
+bool USAttributeComponent::ApplyHeatlhChange(AActor* InstigatorActor, float Delta)
 {
 	if (!GetOwner()->CanBeDamaged() && Delta < 0.0f)
 	{
@@ -93,3 +96,42 @@ bool USAttributeComponent::IsActorAlive(AActor* Actor)
 	
 	return false;
 }
+
+FHitResult USAttributeComponent::GetAimHitResult(ACharacter* InstigatorCharacter) const
+{
+	FVector2D ViewPortSize;
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewPortSize);
+	}
+
+	FVector2D CrosshairLocation(ViewPortSize.X / 2.f, ViewPortSize.Y / 2.f);
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+	FTransform SpawnTM;
+	FHitResult ScreenTraceHit;
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
+	if (bScreenToWorld)
+	{
+		
+		const FVector Start{ CrosshairWorldPosition };
+		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 10000.f };
+
+		FVector HandLocation = InstigatorCharacter->GetMesh()->GetSocketLocation("muzzle_01");
+		FVector EndPoint{ End };
+
+
+		TArray<FHitResult> Hits;
+		float Radius = 30.f;
+		FCollisionShape Shape;
+		Shape.SetSphere(Radius);
+		bool bBlockingHit = GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECC_Visibility);
+		//->SweepMultiByChannel(Hits, Start, End, FQuat::Identity, ECC_Visibility, Shape);   //(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
+		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+		DrawDebugLine(GetWorld(), Start, End, LineColor);
+
+		
+	}
+	return ScreenTraceHit;
+}
+

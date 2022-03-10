@@ -11,6 +11,7 @@ class USAttributeComponent;
 class UUserWidget; 
 class USActionComponent;
 class USWorldUserWidget;
+class USPhysicalAnimationComponent;
 
 UCLASS()
 class SAVINGANDLOADING_API ASAICharacter : public ACharacter
@@ -43,6 +44,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USActionComponent* ActionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USPhysicalAnimationComponent* PhysAnimComp;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn); 

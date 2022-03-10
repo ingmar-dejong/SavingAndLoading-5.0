@@ -8,6 +8,7 @@
 #include "SAttributeComponent.h"
 #include "GameplayFunctionLibrary.h"
 #include "SActionComponent.h"
+#include "SPhysicalAnimationComponent.h"
 
 
 
@@ -29,6 +30,7 @@ void AAMagicProjectile::PostInitializeComponents()
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AAMagicProjectile::OnActorOverlap);
 }
 
+
 void AAMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
  	if (OtherActor && OtherActor != GetInstigator())
@@ -46,17 +48,15 @@ void AAMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		{
 			Explode();
 		}
-		
 
 
-
-//		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
-// 		if (AttributeComp)
-// 		{
-// 			AttributeComp->ApplyHeatlhChange(GetInstigator(), -DamageAmount);
-// 
-// 			Destroy();
-// 		}
+		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+ 		if (AttributeComp)
+ 		{
+ 			AttributeComp->ApplyHeatlhChange(GetInstigator(), -DamageAmount);
+ 
+ 			Destroy();
+ 		}
 	}
 
 	

@@ -13,6 +13,7 @@ class USInteractionComponent;
 class UAnimMontage;
 class USAttributeComponent;
 class USActionComponent;
+class USPhysicalAnimationComponent;
 
 UCLASS()
 class SAVINGANDLOADING_API ASCharacter : public ACharacter
@@ -66,6 +67,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USActionComponent* ActionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USPhysicalAnimationComponent* PhysAnimComp;
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);

@@ -51,6 +51,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	float GetHealth() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	FHitResult GetAimHitResult(ACharacter* InstigatorCharacter) const;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
 };
