@@ -28,6 +28,9 @@ public:
 	UFUNCTION()
 	void HitReactionCall(FHitResult AimHit);
 
+	UFUNCTION()
+	void Ragdoll();
+
 	UFUNCTION(BlueprintCallable, Category = "PhysicallAnimFunctions")
 	static USPhysicalAnimationComponent* GetPhysicallAnimFunctions(AActor* FromActor);
 

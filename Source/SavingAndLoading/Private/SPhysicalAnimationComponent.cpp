@@ -10,6 +10,9 @@
 #include "AIController.h"
 #include "GameFramework/Pawn.h"
 #include "SAttributeComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 
 
@@ -26,45 +29,68 @@ void USPhysicalAnimationComponent::TickComponent(float DeltaTime, enum ELevelTic
 	DeltaTime = DeltaTime * 0.8f;
 	float Interp = FMath::FInterpTo(HitReactionTimeRemaining, 0.f, DeltaTime, 0.5f);
 	HitReactionTimeRemaining = Interp - DeltaTime;
-	TargetCharacter = Cast<ACharacter>(GetOwner());
-	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(TargetCharacter);
+	//TargetCharacter = Cast<ACharacter>(GetOwner());
+	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(GetOwner());
 
 	UE_LOG(LogTemp, Log, TEXT("%f"), HitReactionTimeRemaining);
-	if (!AttributeComp->IsAlive())
+	if (!AttributeComp->IsActorAlive(TargetCharacter))
 	{
 		SetComponentTickEnabled(false);
 		return;
 	}
-	if (HitReactionTimeRemaining <= 0.0f)
-	{
-		HitReactionTimeRemaining = 0.0f;
-		MyCharMesh->SetAllBodiesBelowSimulatePhysics(BoneName, false, true);
-		SetComponentTickEnabled(false); 
-	}
-	else
-	{
-		MyCharMesh->SetAllBodiesBelowPhysicsBlendWeight(BoneName, HitReactionTimeRemaining - 1.0f, false, true);
-	}
-
+		if (HitReactionTimeRemaining <= 0.0f)
+		{
+			HitReactionTimeRemaining = 0.0f;
+			MyCharMesh->SetAllBodiesBelowSimulatePhysics(BoneName, false, true);
+			SetComponentTickEnabled(false);
+		}
+		else
+		{
+			MyCharMesh->SetAllBodiesBelowPhysicsBlendWeight(BoneName, HitReactionTimeRemaining - 1.0f, false, true);
+		}
+ 	
 }
 
 void USPhysicalAnimationComponent::HitReactionCall(FHitResult AimHit)
 {
-	
-		SetComponentTickEnabled(true);
-		FVector Direction = AimHit.TraceEnd - AimHit.TraceStart;
-		HitReactionTimeRemaining = (HitReactionTimeRemaining + 1.5f);
+		
+		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(TargetCharacter);
+		if (AttributeComp->IsActorAlive(TargetCharacter))
+		{
+			SetComponentTickEnabled(true);
+			FVector Direction = AimHit.TraceEnd - AimHit.TraceStart;
+			HitReactionTimeRemaining = (HitReactionTimeRemaining + 1.5f);
 
-		this->ApplyPhysicalAnimationProfileBelow(BoneName, "Strong", false, false);
+			this->ApplyPhysicalAnimationProfileBelow(BoneName, "Strong", false, false);
 
-		if (MyCharMesh)
-		{			
-			MyCharMesh->SetAllBodiesBelowSimulatePhysics(BoneName, true, false);
-			Direction.Normalize();
-			MyCharMesh->AddImpulseAtLocation(Direction * 50000.f, AimHit.Location, BoneName);
+			if (MyCharMesh)
+			{
+				MyCharMesh->SetAllBodiesBelowSimulatePhysics(BoneName, true, false);
+				Direction.Normalize();
+				MyCharMesh->AddImpulseAtLocation(Direction * 50000.f, AimHit.Location, BoneName);
+			}
+
+			return;
 		}
+	
+}
 
-		return;
+void USPhysicalAnimationComponent::Ragdoll()
+{
+	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(TargetCharacter);
+	this->ApplyPhysicalAnimationProfileBelow(BoneName, "Dead", true, false);
+	
+
+	if (MyCharMesh)
+	{
+		MyCharMesh->SetAllBodiesSimulatePhysics(true);
+		TargetCharacter ->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		TargetCharacter->GetCharacterMovement()->DisableMovement();
+		
+	}
+
+
+
 }
 
 void USPhysicalAnimationComponent::BeginPlay()

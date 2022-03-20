@@ -6,9 +6,9 @@
 #include "GameFramework/PlayerState.h"
 #include "SPlayerState.generated.h"
 
-/**
- * 
- */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditsChanged, ASPlayerState*, PlayerState, int32, NewCredits, int32, Delta);
+
 UCLASS()
 class SAVINGANDLOADING_API ASPlayerState : public APlayerState
 {
@@ -31,8 +31,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Credits")
 	bool RemoveCredits(int32 Delta);
 
-	//UPROPERTY(BlueprintAssignable, Category = "Events")
-	//FOnCreditsChanged OnCreditsChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnCreditsChanged OnCreditsChanged;
 
 
 

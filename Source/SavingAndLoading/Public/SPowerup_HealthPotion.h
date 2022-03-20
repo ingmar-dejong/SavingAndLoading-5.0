@@ -24,10 +24,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	int32 CreditCost;
 	
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void Interact_Implementation(APawn* InstigatorPawn) override;
 
 };

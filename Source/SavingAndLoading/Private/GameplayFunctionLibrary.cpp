@@ -5,6 +5,7 @@
 #include "SAttributeComponent.h"
 #include "SPhysicalAnimationComponent.h"
 
+
 bool UGameplayFunctionLibrary::ApplyDamage(AActor* DamageCauser, AActor* TargetActor, float DamageAmount)
 {
 	
@@ -29,21 +30,17 @@ bool UGameplayFunctionLibrary::ApplyDirectionalDamage(AActor* DamageCauser, AAct
 		{
 			
 				PhysComp->HitReactionCall(HitResult);
-			
-			
+				USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(TargetActor);
+				UPrimitiveComponent* HitComp = HitResult.GetComponent();
+				if (AttributeComp->IsActorAlive(TargetActor))
+				{
+					//Direction = Target - Origin
+					FVector Direction = HitResult.TraceEnd - HitResult.TraceStart;
+					Direction.Normalize();
+					HitComp->AddImpulseAtLocation(Direction * 300000.f, HitResult.ImpactPoint, HitResult.BoneName);
+				}
 		}
-		
- 		UPrimitiveComponent* HitComp = HitResult.GetComponent();
- 		if (HitComp && HitComp->IsSimulatingPhysics(HitResult.BoneName))
- 		{
- 			//Direction = Target - Origin
- 			FVector Direction = HitResult.TraceEnd - HitResult.TraceStart;
- 			Direction.Normalize();
- 
- 			
- 			HitComp->AddImpulseAtLocation(Direction * 300000.f, HitResult.ImpactPoint, HitResult.BoneName); 			
-
-		}
+  		
 		return true;
 	}
 	return false;

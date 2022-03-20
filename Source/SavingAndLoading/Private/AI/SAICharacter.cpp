@@ -65,7 +65,7 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
         }
 
         GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParaName, GetWorld()->TimeSeconds);
-
+        USPhysicalAnimationComponent* PhysAnimComponent = USPhysicalAnimationComponent::GetPhysicallAnimFunctions(this);
         if (NewHealth <= 0)
         {
             // Stop BT
@@ -74,13 +74,15 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
             {
                 AIC->GetBrainComponent()->StopLogic("AI Killed"); 
             }
-
-            // Raddoll
-            GetMesh()->SetAllBodiesSimulatePhysics(true);
-            GetMesh()->SetCollisionProfileName("Ragdoll");
-
-            GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-            GetCharacterMovement()->DisableMovement();
+            
+            PhysAnimComponent->Ragdoll();
+//      
+// 
+//             // Raddoll
+//             GetMesh()->SetAllBodiesSimulatePhysics(true);
+// 
+//             GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//             GetCharacterMovement()->DisableMovement();
 
             // Set LifeSpawn
             SetLifeSpan(10.f);

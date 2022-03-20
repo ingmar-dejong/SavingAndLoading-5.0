@@ -21,6 +21,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	TSubclassOf<AActor> Minionclass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Powerups")
+	TSubclassOf<AActor> PowerupClass;
+
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UEnvQuery* SpawnBotQuery;
 
@@ -39,7 +42,15 @@ protected:
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION()
+	void OnPowerupSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Powerups")
+	UEnvQuery* PowerupSpawnQuery;
+
+	int32 CreditsPerKill;
 
 public:
 
