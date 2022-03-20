@@ -6,6 +6,7 @@
 #include "DrawDebugHelpers.h"
 #include "SCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "SWorldUserWidget.h"
 
 static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("su.InteractionDebugDraw"), false, TEXT("Enable Debug Lines for Interact Component"), ECVF_Cheat);
 
@@ -16,6 +17,9 @@ USInteractionComponent::USInteractionComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	
+	TraceDistance = 800.f;
+	TraceRadius = 30.f;
+	CollisionChannel = ECC_WorldDynamic;
 }
 
 
@@ -24,8 +28,6 @@ void USInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
 }
 
 
@@ -34,15 +36,10 @@ void USInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	FindBestInteractable();
 }
 
-FHitResult USInteractionComponent::GetHitResult() const
-{
-	return HitResultAttack;
-}
-
-void USInteractionComponent::PrimaryInteract()
+void USInteractionComponent::FindBestInteractable()
 {
 	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
 
@@ -64,28 +61,30 @@ void USInteractionComponent::PrimaryInteract()
 		AActor* MyOwner = GetOwner();
 		FHitResult ScreenTraceHit;
 		const FVector Start{ CrosshairWorldPosition };
-		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 800.f };
-		
+		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * TraceDistance };
+
 		FVector EndPoint{ End };
 
 		TArray<FHitResult> Hits;
-		float Radius = 30.f;
 		FCollisionShape Shape;
-		Shape.SetSphere(Radius);
-		
+		Shape.SetSphere(TraceRadius);
+
 		FCollisionObjectQueryParams ObjectQeuryParams;
-		ObjectQeuryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjectQeuryParams.AddObjectTypesToQuery(CollisionChannel);
 
 		bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, Start, End, FQuat::Identity, ObjectQeuryParams, Shape);
 		GetWorld()->LineTraceSingleByObjectType(HitResultAttack, Start, End, ObjectQeuryParams);
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f, 1.f);
+		//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f, 1.f);
 		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+
+		// Clear ref before trying to fill
+		FocusedActor = nullptr;
 
 		for (FHitResult Hit : Hits)
 		{
 			if (bDebugDraw)
 			{
-				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
+				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, TraceRadius, 32, LineColor, false, 2.f);
 			}
 
 			AActor* HitActor = Hit.GetActor();
@@ -93,23 +92,65 @@ void USInteractionComponent::PrimaryInteract()
 			{
 				if (HitActor->Implements<USGameplayInterface>()) // Hier "U " prefix omdat checkt of de hele Interface bestaat
 				{
-					APawn* MyPawn = Cast<APawn>(MyOwner);
-					ISGameplayInterface::Execute_Interact(HitActor, MyPawn); // "I" prefix omdat je cast naar het level?
+					FocusedActor = HitActor;
 					break;
 				}
 
 			}
-			
-		}
 
-		if (bDebugDraw)
-		{
-			DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.f, 0, 2.f);
 		}
+		
+		if (FocusedActor)
+		{
+			if (DefaultWidgetInstance == nullptr && ensure(DefaultWidgetClass))
+			{
+				DefaultWidgetInstance = CreateWidget<USWorldUserWidget>(GetWorld(), DefaultWidgetClass);
+			}
+
+			if (DefaultWidgetInstance)
+			{
+				DefaultWidgetInstance->AttachedActor = FocusedActor;
+
+				if (!DefaultWidgetInstance->IsInViewport())
+				{
+					DefaultWidgetInstance->AddToViewport();
+				}
+				
+			}
+
+		}
+		else
+		{
+			if (DefaultWidgetInstance)
+			{
+				DefaultWidgetInstance->RemoveFromParent();
+			}
+		}
+		
 
 
 
 	}
+}
+
+
+
+FHitResult USInteractionComponent::GetHitResult() const
+{
+	return HitResultAttack;
+}
+
+void USInteractionComponent::PrimaryInteract()
+{
+	if (FocusedActor == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No Focus Actor to interact");
+		return;
+
+	}
+
+	APawn* MyPawn = Cast<APawn>(GetOwner());
+	ISGameplayInterface::Execute_Interact(FocusedActor, MyPawn); // "I" prefix omdat je cast naar het level?
 	
 
 // 	AActor* MyOwner = GetOwner();

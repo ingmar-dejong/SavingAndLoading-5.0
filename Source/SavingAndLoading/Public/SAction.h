@@ -33,6 +33,9 @@ protected:
 
 public:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	bool bAutoStart;
+
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	bool IsRunning() const;
 

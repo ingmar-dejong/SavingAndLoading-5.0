@@ -13,5 +13,30 @@ UCLASS()
 class SAVINGANDLOADING_API USActionEffect : public USAction
 {
 	GENERATED_BODY()
+
+public:
+
+	void StartAction_Implementation(AActor* Instigator) override;
+
+	void StopAction_Implementation(AActor* Instigator) override;
+
+	USActionEffect();
+
+protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effect")
+	float Duration;
+
+	/* Time between 'ticks' to apply effect */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effect")
+	float Period;
+
+	FTimerHandle PeriodHandle;
+	FTimerHandle DurationHandle;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Effect")
+	void ExecutePeriodicEffect(AActor* Instigator);
+
+	
 	
 };

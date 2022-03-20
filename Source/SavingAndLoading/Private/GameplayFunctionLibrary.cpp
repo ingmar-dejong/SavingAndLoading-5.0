@@ -14,9 +14,7 @@ bool UGameplayFunctionLibrary::ApplyDamage(AActor* DamageCauser, AActor* TargetA
 	if (AttributeComp)
 	{
 		return AttributeComp->ApplyHeatlhChange(DamageCauser, -DamageAmount);
-	
-		
-		
+	 
 	}
 	return false;
 }

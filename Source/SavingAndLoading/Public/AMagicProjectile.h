@@ -8,6 +8,8 @@
 #include "GameplayTagContainer.h"
 #include "AMagicProjectile.generated.h"
 
+class USActionEffect;
+
 
 
 UCLASS()
@@ -25,6 +27,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTag ParryTag;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<USActionEffect> BurningActionClass;
 
 	virtual void PostInitializeComponents() override;
 

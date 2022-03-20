@@ -9,7 +9,7 @@
 #include "GameplayFunctionLibrary.h"
 #include "SActionComponent.h"
 #include "SPhysicalAnimationComponent.h"
-
+#include "SActionEffect.h"
 
 
 
@@ -47,6 +47,11 @@ void AAMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		if(UGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
 			Explode();
+
+			if (ActionComp)
+			{
+				ActionComp->AddAction(GetInstigator(), BurningActionClass);
+			}
 		}
 
 
