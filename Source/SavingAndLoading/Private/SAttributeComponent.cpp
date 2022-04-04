@@ -14,6 +14,9 @@ USAttributeComponent::USAttributeComponent()
 {
 	MaxHealth = 100.f;
 	Health = MaxHealth;
+
+	MaxRage = 100.f;
+	Rage = 0.f;
 }
 
 bool USAttributeComponent::Kill(AActor* InstigatorActor)
@@ -43,6 +46,37 @@ float USAttributeComponent::GetHealth() const
 	return Health;
 }
 
+float USAttributeComponent::GetMaxRage() const
+{
+	return MaxRage;
+}
+
+float USAttributeComponent::GetRage() const
+{
+	return Rage;
+}
+
+bool USAttributeComponent::ApplyRageChange(AActor* InstigatorActor, float Delta)
+{
+
+	float OldRage = Rage;
+	float NewRage = FMath::Clamp(Rage + Delta, 0.0f, MaxRage);
+	float ActualDelta = NewRage + OldRage;
+
+	Rage = NewRage;
+	if (ActualDelta == MaxRage)
+	{
+		return false;
+	}
+
+	if (ActualDelta != 0.0f)
+	{
+		OnRageChanged.Broadcast(InstigatorActor, this, Rage, ActualDelta);
+	}
+	
+	return ActualDelta != 0;
+}
+
 bool USAttributeComponent::ApplyHeatlhChange(AActor* InstigatorActor, float Delta)
 {
 	if (!GetOwner()->CanBeDamaged() && Delta < 0.0f)
@@ -64,6 +98,8 @@ bool USAttributeComponent::ApplyHeatlhChange(AActor* InstigatorActor, float Delt
 	Health = NewHealth;
 
 	OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
+	//USAttributeComponent::ApplyRageChange(InstigatorActor, 20.f);
+
 	if (ActualDelta < 0.0f && Health == 0.0f)
 	{
 		ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
@@ -134,4 +170,3 @@ FHitResult USAttributeComponent::GetAimHitResult(ACharacter* InstigatorCharacter
 	}
 	return ScreenTraceHit;
 }
-

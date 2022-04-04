@@ -37,7 +37,7 @@ ASCharacter::ASCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	TimeToHitParaName = "TimeToHit";
-
+	RagePerHit = 5;
 }
 
 void ASCharacter::PostInitializeComponents()
@@ -72,6 +72,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASCharacter::Jump);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
+	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ASCharacter::SecondaryAttack);
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ASCharacter::DashTeleport);
 
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASCharacter::SprintStart);
@@ -107,6 +108,11 @@ void ASCharacter::JumpEnd()
 	bPressedJump = false;
 }
 
+void ASCharacter::SecondaryAttack()
+{
+	ActionComp->StartActionByName(this, "SecondaryAttack");
+}
+
 void ASCharacter::PrimaryInteract()
 {
 	if (InteractionComp)
@@ -117,16 +123,27 @@ void ASCharacter::PrimaryInteract()
 }
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
+	OwningComp->ApplyRageChange(InstigatorActor, RagePerHit);
+
 	if (Delta < 0.0f)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParaName, GetWorld()->TimeSeconds);
 	}
 
-	if (NewHealth<= 0.0f && Delta < 0.0f)
+	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
 		PhysAnimComp->Ragdoll();
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		DisableInput(PC);
+	}
+}
+
+void ASCharacter::OnRageChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewRage, float Delta)
+{
+
+	if (NewRage == OwningComp->GetMaxRage())
+	{
+		return;
 	}
 }
 

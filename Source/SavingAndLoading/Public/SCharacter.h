@@ -32,6 +32,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Targeting")
 	float SweepRadius;
 
+	int32 RagePerHit;
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 
@@ -54,6 +56,7 @@ protected:
 	void PrimaryAttack(); 
 	void JumpStart();
 	void JumpEnd();
+	void SecondaryAttack();
 	void PrimaryInteract();
 	void DashTeleport();
 
@@ -74,7 +77,8 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
-
+	UFUNCTION()
+	void OnRageChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewRage, float Delta);
 
 public:	
 	// Called every frame
