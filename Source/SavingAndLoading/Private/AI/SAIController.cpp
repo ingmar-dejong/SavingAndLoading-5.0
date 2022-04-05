@@ -17,12 +17,11 @@ void ASAIController::BeginPlay()
 	}
 	
 
-// 	APawn* MyPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-// 	if (MyPawn)
-// 	{
-// 		GetBlackboardComponent()->SetValueAsVector("MoveToLocation", MyPawn->GetActorLocation());
-// 
-// 		GetBlackboardComponent()->SetValueAsObject("TargetActor", MyPawn);
-// 	}
+//  	APawn* MyPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+//  	if (MyPawn)
+//  	{
+//  		GetBlackboardComponent()->SetValueAsVector("MoveToLocation", MyPawn->GetActorLocation());
+//  		GetBlackboardComponent()->SetValueAsObject("TargetActor", MyPawn);
+//  	}
 }
 

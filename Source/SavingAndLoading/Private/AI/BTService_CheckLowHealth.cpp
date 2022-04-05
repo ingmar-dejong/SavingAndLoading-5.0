@@ -26,7 +26,7 @@ void UBTService_CheckLowHealth::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 					if (ensure(AttributeComp))
 					{
 						
-						if (AttributeComp->GetHealth() <= 30.f)
+						if (AttributeComp->GetHealth() <= 50.f)
 						{
 							UE_LOG(LogTemp, Warning, TEXT("AI Health is: %f , HIDE!"), AttributeComp->GetHealth()); 
 							bIsLowHealth = true;
