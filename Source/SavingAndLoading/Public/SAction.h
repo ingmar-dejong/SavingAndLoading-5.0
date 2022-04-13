@@ -48,6 +48,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
 	void StopAction(AActor* Instigator);
 
+
 	// Action nickname to start/stop without a reference to the object
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FName ActionName;

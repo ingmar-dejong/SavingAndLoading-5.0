@@ -32,6 +32,8 @@ ASAICharacter::ASAICharacter()
     GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
     GetMesh()->SetGenerateOverlapEvents(true);
 
+    TargetActorKey = "TargetActor";
+
     TimeToHitParaName = "TimeToHit";
 }
 
@@ -95,27 +97,42 @@ void ASAICharacter::SetTargetActor(AActor* NewTarget)
 	AAIController* AIC = Cast<AAIController>(GetController());
     if (AIC)
     {
-       AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
+       AIC->GetBlackboardComponent()->SetValueAsObject(TargetActorKey, NewTarget);
     }
 }
 
 
+AActor* ASAICharacter::GetTargetActor() const
+{
+    AAIController* AIC = Cast<AAIController>(GetController());
+        if (AIC)
+        {
+            return Cast<AActor>(AIC->GetBlackboardComponent()->GetValueAsObject(TargetActorKey));
+        }
+
+        return nullptr;
+}
+
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
-    SetTargetActor(Pawn);
+   if (GetTargetActor() != Pawn)
+   {
+       SetTargetActor(Pawn);
+	   USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(), SpottedWidgetClass);
+	   if (NewWidget)
+	   {
+		   NewWidget->AttachedActor = this;
+		   NewWidget->AddToViewport(10);
+	   }
+
+   }
+    
     //DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.f, true);
-
-    USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(), SpottedWidgetClass);
-    if (NewWidget)
-    {
-        NewWidget->AttachedActor = this;
-
-        NewWidget->AddToViewport(10);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No Widget"));
-    }
+  
+		
+		
+    
+    
 
    
 }

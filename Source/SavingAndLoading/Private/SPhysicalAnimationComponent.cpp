@@ -32,7 +32,7 @@ void USPhysicalAnimationComponent::TickComponent(float DeltaTime, enum ELevelTic
 	//TargetCharacter = Cast<ACharacter>(GetOwner());
 	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(GetOwner());
 
-	UE_LOG(LogTemp, Log, TEXT("%f"), HitReactionTimeRemaining);
+	//UE_LOG(LogTemp, Log, TEXT("%f"), HitReactionTimeRemaining);
 	if (!AttributeComp->IsActorAlive(TargetCharacter))
 	{
 		SetComponentTickEnabled(false);

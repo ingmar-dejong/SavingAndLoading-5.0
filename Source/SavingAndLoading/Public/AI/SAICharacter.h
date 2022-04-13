@@ -35,7 +35,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParaName;
 
+	UFUNCTION(BlueprintCallable, Category = "AI")
 	void SetTargetActor(AActor* NewTarget);
+
+	/* Key for AI Blackboard 'TargetActor' */
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TargetActorKey;
+
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	AActor* GetTargetActor() const;
 
 	virtual void PostInitializeComponents() override;
 

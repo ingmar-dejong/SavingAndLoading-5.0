@@ -14,6 +14,8 @@ class UAnimMontage;
 class USAttributeComponent;
 class USActionComponent;
 class USPhysicalAnimationComponent;
+class USActionEffect;
+class USActionEffect_Thorns;
 
 UCLASS()
 class SAVINGANDLOADING_API ASCharacter : public ACharacter
@@ -33,6 +35,9 @@ protected:
 	float SweepRadius;
 
 	int32 RagePerHit;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<USActionEffect_Thorns> ThornsActionClass;
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;

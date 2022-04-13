@@ -45,6 +45,7 @@ void USAction::StopAction_Implementation(AActor* Instigator)
 	bIsRunning = false;
 }
 
+
 UWorld* USAction::GetWorld() const
 {
 	// Outer is set when creating Action via NewObject<T>

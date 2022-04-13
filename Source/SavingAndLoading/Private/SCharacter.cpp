@@ -11,7 +11,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "../Private/KismetTraceUtils.h"
 #include "SActionComponent.h"
+#include "SActionEffect.h"
 #include "SPhysicalAnimationComponent.h"
+#include "SActionEffect_Thorns.h"
 
 static TAutoConsoleVariable<bool> CVarDebugDrawProjectile(TEXT("su.ProjectileDebugDraw"), false, TEXT("Enable Debug Lines for Projectile Component"), ECVF_Cheat);
 
@@ -52,6 +54,10 @@ void ASCharacter::PostInitializeComponents()
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	if (ActionComp)
+	{
+		ActionComp->AddAction(this, ThornsActionClass);
+	}
 	
 }
 
@@ -136,6 +142,7 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		DisableInput(PC);
 	}
+	
 }
 
 void ASCharacter::OnRageChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewRage, float Delta)
