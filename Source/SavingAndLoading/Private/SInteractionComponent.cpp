@@ -36,8 +36,15 @@ void USInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FindBestInteractable();
+	APawn* MyPawn = Cast<APawn>(GetOwner());
+		if (MyPawn->IsLocallyControlled())
+		{
+			FindBestInteractable();
+		}
 }
+	
+
+
 
 void USInteractionComponent::FindBestInteractable()
 {
@@ -142,7 +149,12 @@ FHitResult USInteractionComponent::GetHitResult() const
 
 void USInteractionComponent::PrimaryInteract()
 {
-	if (FocusedActor == nullptr)
+	ServerInteract(FocusedActor);
+}
+
+void USInteractionComponent::ServerInteract_Implementation(AActor* InFocus)
+{
+	if (InFocus == nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No Focus Actor to interact");
 		return;
@@ -150,49 +162,5 @@ void USInteractionComponent::PrimaryInteract()
 	}
 
 	APawn* MyPawn = Cast<APawn>(GetOwner());
-	ISGameplayInterface::Execute_Interact(FocusedActor, MyPawn); // "I" prefix omdat je cast naar het level?
-	
-
-// 	AActor* MyOwner = GetOwner();
-// 	
-// 	FVector EyeLocation;
-// 	FRotator EyeRotation;
-// 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-// 
-// 	FVector End = EyeLocation + (EyeRotation.Vector() * 1000);
-// 
-// 
-// 	//FHitResult Hit;
-// 	//bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQeuryParams);
-// 
-// 	TArray<FHitResult> Hits;
-// 	float Radius = 30.f;
-// 	FCollisionShape Shape;
-// 	Shape.SetSphere(Radius);
-// 
-// 	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQeuryParams, Shape);
-// 	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-// 
-// 	for (FHitResult Hit : Hits)
-// 	{
-// 		AActor* HitActor = Hit.GetActor();
-// 		if (HitActor)
-// 		{
-// 			if (HitActor->Implements<USGameplayInterface>()) // Hier "U " prefix omdat checkt of de hele Interface bestaat
-// 			{
-// 				APawn* MyPawn = Cast<APawn>(MyOwner);
-// 				ISGameplayInterface::Execute_Interact(HitActor, MyPawn); // "I" prefix omdat je cast naar het level?
-// 				break;
-// 			}
-// 
-// 		}
-// 		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
-// 	}
-// 
-// 
-// 
-// 
-// 	DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.f, 0, 2.f);
-
-
+	ISGameplayInterface::Execute_Interact(InFocus, MyPawn); // "I" prefix omdat je cast naar het level?
 }

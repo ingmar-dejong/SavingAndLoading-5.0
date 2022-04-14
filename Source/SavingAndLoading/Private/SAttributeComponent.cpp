@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Character.h"
+#include "Net/UnrealNetwork.h"
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplier"), true, TEXT("Global Damage Modifier for Attribute Component"), ECVF_Cheat);
 
@@ -17,7 +18,11 @@ USAttributeComponent::USAttributeComponent()
 
 	MaxRage = 100.f;
 	Rage = 0.f;
+
+	SetIsReplicatedByDefault(true);
 }
+
+
 
 bool USAttributeComponent::Kill(AActor* InstigatorActor)
 {
@@ -97,8 +102,14 @@ bool USAttributeComponent::ApplyHeatlhChange(AActor* InstigatorActor, float Delt
 
 	Health = NewHealth;
 
-	OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
-	//USAttributeComponent::ApplyRageChange(InstigatorActor, 20.f);
+	//OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);// Niet meer nodig, Multicast zal dit doen voor de dserver en alle clients
+	// Als dit van de client wordt verstuurd dan stuurt ie het alleen lokaal dus nergens anders heen./
+	if (ActualDelta != 0.0f)
+	{
+		MulticastHealthChanged(InstigatorActor, Health, ActualDelta);
+	}
+	
+	
 
 	if (ActualDelta < 0.0f && Health == 0.0f)
 	{
@@ -170,3 +181,19 @@ FHitResult USAttributeComponent::GetAimHitResult(ACharacter* InstigatorCharacter
 	}
 	return ScreenTraceHit;
 }
+
+void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
+{
+	OnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta);
+}
+
+void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USAttributeComponent, Health);
+	DOREPLIFETIME(USAttributeComponent, MaxHealth);
+
+	//DOREPLIFETIME_CONDITION(USAttributeComponent, MaxHealth, COND_OwnerOnly);
+}
+

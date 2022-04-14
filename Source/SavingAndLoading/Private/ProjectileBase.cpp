@@ -26,6 +26,8 @@ AProjectileBase::AProjectileBase()
 	MovementComp->InitialSpeed = 2000.f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
+
+	//SetReplicates(true);
 }
 
 void AProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
