@@ -3,6 +3,7 @@
 
 #include "SActionComponent.h"
 #include "SAction.h"
+#include "../SavingAndLoading.h"
 
 // Sets default values for this component's properties
 USActionComponent::USActionComponent()
@@ -10,6 +11,7 @@ USActionComponent::USActionComponent()
 
 	PrimaryComponentTick.bCanEverTick = true;
 
+	SetIsReplicatedByDefault(true);
 
 }
 
@@ -33,8 +35,19 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+// 	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+// 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+
+
+
+	// Draw All Actions
+ 	for (USAction* Action : Actions)
+ 	{
+ 		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+ 		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
+ 
+ 		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
+ 	}
 
 }
 
@@ -93,6 +106,13 @@ bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 				continue;
 			}
 
+// 			Is Client? To avoid infinite loop, in dit vb dus geen auth betekent dus dat je de client bent. Wel auth dan ben je de server.
+			if (!GetOwner()->HasAuthority())
+			{
+				ServerStartAction(Instigator, ActionName);
+			}
+			
+
 			Action->StartAction(Instigator);
 			return true;
 		}
@@ -117,6 +137,11 @@ bool USActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 	}
 
 	return false;
+}
+
+void USActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StartActionByName(Instigator, ActionName);
 }
 
 

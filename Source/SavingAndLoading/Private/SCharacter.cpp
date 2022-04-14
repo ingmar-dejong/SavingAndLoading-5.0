@@ -54,10 +54,10 @@ void ASCharacter::PostInitializeComponents()
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if (ActionComp)
-	{
-		ActionComp->AddAction(this, ThornsActionClass);
-	}
+// 	if (ActionComp)
+// 	{
+// 		ActionComp->AddAction(this, ThornsActionClass);
+// 	}
 	
 }
 
