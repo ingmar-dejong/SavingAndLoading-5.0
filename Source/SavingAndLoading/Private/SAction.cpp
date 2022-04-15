@@ -4,13 +4,16 @@
 #include "SAction.h"
 #include "SActionComponent.h"
 #include "../SavingAndLoading.h"
+#include "Net/UnrealNetwork.h"
 
+void USAction::Initialize(USActionComponent* NewActionComp)
+{
+	ActionComp = NewActionComp;
+}
 
 
 bool USAction::CanStart_Implementation(AActor* Instigator)
 {
-	
-
 	if (IsRunning())
 	{
 		return false;
@@ -41,7 +44,8 @@ void USAction::StopAction_Implementation(AActor* Instigator)
 {
 	//UE_LOG(LogTemp, Log, TEXT("Stopped: %s"), *GetNameSafe(this));
 	LogOnScreen(this, FString::Printf(TEXT("Stopped: %s"), *ActionName.ToString()), FColor::White);
-	ensureAlways(bIsRunning);
+	
+	//ensureAlways(bIsRunning);
 
 	USActionComponent* Comp = GetOwningComponent();
 	Comp->ActiveGameplayTags.RemoveTags(GrantsTags);
@@ -53,10 +57,10 @@ void USAction::StopAction_Implementation(AActor* Instigator)
 UWorld* USAction::GetWorld() const
 {
 	// Outer is set when creating Action via NewObject<T>
-	UActorComponent* Comp = Cast<UActorComponent>(GetOuter());
-	if (Comp)
+	AActor* Actor = Cast<AActor>(GetOuter());
+	if (Actor)
 	{
-		return Comp->GetWorld();
+		return Actor->GetWorld();
 	}
 	
 	return nullptr;
@@ -64,11 +68,32 @@ UWorld* USAction::GetWorld() const
 
 USActionComponent* USAction::GetOwningComponent() const
 {
-	return Cast<USActionComponent>(GetOuter());
+	return ActionComp;
 }
+
+void USAction::OnRep_IsRunning()
+{
+	if (bIsRunning)
+	{
+		StartAction(nullptr);
+	}
+	else
+	{
+		StopAction(nullptr);
+	}
+}
+
 
 bool USAction::IsRunning() const
 {
 	return bIsRunning;
 }
 
+void USAction::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USAction, bIsRunning);
+	DOREPLIFETIME(USAction, ActionComp);
+
+}
