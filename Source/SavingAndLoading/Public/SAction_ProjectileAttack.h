@@ -18,6 +18,14 @@ class SAVINGANDLOADING_API USAction_ProjectileAttack : public USAction
 	
 protected:
 
+	/* Sphere radius of the sweep to find desired target under crosshair. Adjusts final projectile direction */
+	UPROPERTY(EditAnywhere, Category = "Targeting")
+		float SweepRadius;
+
+	/* Fallback distance when sweep finds no collision under crosshair. Adjusts final projectile direction */
+	UPROPERTY(EditAnywhere, Category = "Targeting")
+		float SweepDistanceFallback;
+
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
 
@@ -36,6 +44,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName HandSocketName;
 
+	UPROPERTY()
+	bool bScreenToWorld;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 PlayerIndex;
 
 public:
 
@@ -43,6 +56,4 @@ public:
 
 	USAction_ProjectileAttack();
 	
-
-
 };

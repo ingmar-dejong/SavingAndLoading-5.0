@@ -98,29 +98,36 @@ bool USAttributeComponent::ApplyHeatlhChange(AActor* InstigatorActor, float Delt
 
 	float OldHealth = Health;
 	float NewHealth = FMath::Clamp(Health + Delta, 0.0f, MaxHealth);
+
 	float ActualDelta = NewHealth - OldHealth;
 
-	Health = NewHealth;
-
-	//OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);// Niet meer nodig, Multicast zal dit doen voor de dserver en alle clients
-	// Als dit van de client wordt verstuurd dan stuurt ie het alleen lokaal dus nergens anders heen./
-	if (ActualDelta != 0.0f)
+	// Is Server?
+	if (GetOwner()->HasAuthority())
 	{
-		MulticastHealthChanged(InstigatorActor, Health, ActualDelta);
-	}
-	
-	
+		Health = NewHealth;
 
-	if (ActualDelta < 0.0f && Health == 0.0f)
-	{
-		ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
-		if (GM)
+		//OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);// Niet meer nodig, Multicast zal dit doen voor de dserver en alle clients
+		// Als dit van de client wordt verstuurd dan stuurt ie het alleen lokaal dus nergens anders heen.
+
+		if (ActualDelta != 0.0f)
 		{
-			GM->OnActorKilled(GetOwner(), InstigatorActor); 
+			MulticastHealthChanged(InstigatorActor, Health, ActualDelta);
 		}
-	}
 
-	return true;
+		// Died
+		if (ActualDelta < 0.0f && Health == 0.0f)
+		{
+			ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
+			if (GM)
+			{
+				GM->OnActorKilled(GetOwner(), InstigatorActor);
+			}
+		}
+
+
+	}
+	
+	return ActualDelta != 0;
 }
 
 USAttributeComponent* USAttributeComponent::GetAttributes(AActor* FromActor)
