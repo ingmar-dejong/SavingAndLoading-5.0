@@ -12,6 +12,9 @@
 #include "SCharacter.h"
 #include "GameFramework/Actor.h"
 #include "SPlayerState.h"
+#include "Kismet/GameplayStatics.h"
+#include "SSaveGame.h"
+#include "GameFramework/GameStateBase.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable Spawning of Bots via timer"), ECVF_Cheat);
 
@@ -22,6 +25,16 @@ ASGameModeBase::ASGameModeBase()
 	CreditsPerKill = 20;
 
 	PlayerStateClass = ASPlayerState::StaticClass();
+
+	SlotName = "SaveGame01";
+}
+
+// Load as soon as possible so all others can use this file when needed!
+void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	LoadSaveGame();
 }
 
 void ASGameModeBase::StartPlay()
@@ -51,6 +64,8 @@ void ASGameModeBase::KillAll()
 
 	}
 }
+
+
 
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
@@ -185,4 +200,43 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
+}
+
+void ASGameModeBase::WriteSaveGame()
+{
+
+	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	{
+		ASPlayerState* PS = Cast<ASPlayerState>(GameState->PlayerArray[i]);
+		if (PS)
+		{
+			PS->SavePlayerState(CurrentSaveGame);
+			break;
+		}
+
+	}
+
+
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
+
+}
+
+void ASGameModeBase::LoadSaveGame()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+		CurrentSaveGame = Cast <USSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		if (CurrentSaveGame == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame Data"));
+		}
+		
+		UE_LOG(LogTemp, Log, TEXT("LOADED SaveGame data"));
+	}
+	else
+	{
+		CurrentSaveGame = Cast <USSaveGame>(UGameplayStatics::CreateSaveGameObject(USSaveGame::StaticClass()));
+
+		UE_LOG(LogTemp, Log, TEXT("CREATED new SaveGame Data"));
+	}
 }

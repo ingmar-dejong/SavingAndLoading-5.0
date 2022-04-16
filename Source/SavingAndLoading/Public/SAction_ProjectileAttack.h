@@ -20,11 +20,11 @@ protected:
 
 	/* Sphere radius of the sweep to find desired target under crosshair. Adjusts final projectile direction */
 	UPROPERTY(EditAnywhere, Category = "Targeting")
-		float SweepRadius;
+	float SweepRadius;
 
 	/* Fallback distance when sweep finds no collision under crosshair. Adjusts final projectile direction */
 	UPROPERTY(EditAnywhere, Category = "Targeting")
-		float SweepDistanceFallback;
+	float SweepDistanceFallback;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
@@ -46,9 +46,6 @@ protected:
 
 	UPROPERTY()
 	bool bScreenToWorld;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 PlayerIndex;
 
 public:
 

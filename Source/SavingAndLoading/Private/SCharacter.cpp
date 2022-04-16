@@ -131,16 +131,20 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 {
 	OwningComp->ApplyRageChange(InstigatorActor, RagePerHit);
 
+	// Damaged
 	if (Delta < 0.0f)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParaName, GetWorld()->TimeSeconds);
 	}
 
+	// Died
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
 		PhysAnimComp->Ragdoll();
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		DisableInput(PC);
+
+		SetLifeSpan(5.0f);
 	}
 	
 }

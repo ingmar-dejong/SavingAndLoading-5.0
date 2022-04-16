@@ -48,20 +48,20 @@ void AAMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		{
 			Explode();
 
-			if (ActionComp)
+			if (ActionComp && HasAuthority())
 			{
 				ActionComp->AddAction(GetInstigator(), BurningActionClass);
 			}
 		}
 
 
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
- 		if (AttributeComp)
- 		{
- 			AttributeComp->ApplyHeatlhChange(GetInstigator(), -DamageAmount);
- 
- 			Destroy();
- 		}
+// 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+//  		if (AttributeComp)
+//  		{
+//  			AttributeComp->ApplyHeatlhChange(GetInstigator(), -DamageAmount);
+//  
+//  			Destroy();
+//  		}
 	}
 
 	

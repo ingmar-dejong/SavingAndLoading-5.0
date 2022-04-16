@@ -10,6 +10,7 @@
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
+class USSaveGame;
 
 UCLASS()
 class SAVINGANDLOADING_API ASGameModeBase : public AGameModeBase
@@ -17,6 +18,11 @@ class SAVINGANDLOADING_API ASGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 protected:
+
+	FString SlotName;
+	
+	UPROPERTY()
+	USSaveGame* CurrentSaveGame;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	TSubclassOf<AActor> Minionclass;
@@ -59,8 +65,15 @@ public:
 	ASGameModeBase();
 	virtual void StartPlay() override;
 
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
 	UFUNCTION(Exec)
 	void KillAll();
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
+
+	void LoadSaveGame();
 
 	
 };
