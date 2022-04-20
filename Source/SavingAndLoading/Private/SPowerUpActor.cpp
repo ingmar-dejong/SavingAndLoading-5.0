@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "SAttributeComponent.h"
 #include "GameFramework/Actor.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASPowerUpActor::ASPowerUpActor()
@@ -21,13 +22,6 @@ ASPowerUpActor::ASPowerUpActor()
 	SetReplicates(true);
 }
 
-// Called when the game starts or when spawned
-void ASPowerUpActor::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
 // Called every frame
 void ASPowerUpActor::Tick(float DeltaTime)
 {
@@ -39,6 +33,13 @@ void ASPowerUpActor::Interact_Implementation(APawn* InstigatorPawn)
 {
 	
 
+}
+
+void ASPowerUpActor::OnRep_IsActive()
+{
+	SetActorEnableCollision(bIsActive);
+
+	RootComponent->SetVisibility(bIsActive, true);
 }
 
 void ASPowerUpActor::ShowPowerup()
@@ -56,7 +57,13 @@ void ASPowerUpActor::HideAndCooldownPowerup()
 
 void ASPowerUpActor::SetPowerupState(bool bNewIsActive)
 {
-	SetActorEnableCollision(bNewIsActive);
+	bIsActive = bNewIsActive;
+	OnRep_IsActive();
+}
 
-	RootComponent->SetVisibility(bNewIsActive, true);
+void ASPowerUpActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASPowerUpActor, bIsActive);
 }

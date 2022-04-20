@@ -65,6 +65,8 @@ public:
 	ASGameModeBase();
 	virtual void StartPlay() override;
 
+	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
 	UFUNCTION(Exec)

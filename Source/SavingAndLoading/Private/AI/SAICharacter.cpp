@@ -118,21 +118,20 @@ void ASAICharacter::OnPawnSeen(APawn* Pawn)
    if (GetTargetActor() != Pawn)
    {
        SetTargetActor(Pawn);
-	   USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(), SpottedWidgetClass);
-	   if (NewWidget)
-	   {
-		   NewWidget->AttachedActor = this;
-		   NewWidget->AddToViewport(10);
-	   }
-
+	   
+       MulticastPawnSeen();
    }
     
     //DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.f, true);
-  
-		
-		
-    
-    
+ 
+}
 
-   
+void ASAICharacter::MulticastPawnSeen_Implementation()
+{
+	USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(), SpottedWidgetClass);
+	if (NewWidget)
+	{
+		NewWidget->AttachedActor = this;
+		NewWidget->AddToViewport(10);
+	}
 }
