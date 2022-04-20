@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "SPlayerController.generated.h"
 
+class UUserWidget;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPawnChanged, APawn*, NewPawn);
 
 
@@ -18,6 +20,17 @@ class SAVINGANDLOADING_API ASPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> PauseMenuClass;
+	
+	UPROPERTY()
+	UUserWidget* PauseMenuInstance;
+
+	UFUNCTION(BlueprintCallable)
+	void TogglePauseMenu();
+
+	void SetupInputComponent() override;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPawnChanged OnPawnChanged;
