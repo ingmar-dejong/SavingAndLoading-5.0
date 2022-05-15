@@ -54,6 +54,9 @@ protected:
 	FActionRepData RepData;
 	//bool bIsRunning;
 
+	UPROPERTY(Replicated)
+	float TimeStarted;
+
 	UFUNCTION()
 	void OnRep_RepData();
 
