@@ -30,5 +30,8 @@ public:
 	void Interact(APawn* InstigatorPawn);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FText GetInteractText(APawn* InsitgatorPawn);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Overlap(APawn* InstigatorPawn);
 };
