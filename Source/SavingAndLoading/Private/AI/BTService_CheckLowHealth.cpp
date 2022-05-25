@@ -5,6 +5,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
 #include "SAttributeComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void UBTService_CheckLowHealth::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
@@ -30,6 +31,11 @@ void UBTService_CheckLowHealth::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 						{
 							UE_LOG(LogTemp, Warning, TEXT("AI Health is: %f , HIDE!"), AttributeComp->GetHealth()); 
 							bIsLowHealth = true;
+							UCharacterMovementComponent* CharacterMovement = Cast<UCharacterMovementComponent>(AIPawn->GetMovementComponent());
+							if (CharacterMovement)
+							{
+								CharacterMovement->SetMovementMode(MOVE_Flying);
+							}
 						}
 					}
 				BlackboardComp->SetValueAsBool(GoHide.SelectedKeyName, bIsLowHealth);

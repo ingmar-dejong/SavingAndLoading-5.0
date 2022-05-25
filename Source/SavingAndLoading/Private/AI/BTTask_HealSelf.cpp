@@ -5,6 +5,7 @@
 #include "SAttributeComponent.h"
 #include "AIController.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BlackBoardComponent.h"
 
 
@@ -20,6 +21,8 @@ EBTNodeResult::Type UBTTask_HealSelf::ExecuteTask(UBehaviorTreeComponent& OwnerC
 		if (ensure(AttributeComp))
 		{
 			AttributeComp->ApplyHeatlhChange(MyPawn, AttributeComp->GetMaxHealth());
+			
+			
 		}
 
 		return EBTNodeResult::Succeeded;
