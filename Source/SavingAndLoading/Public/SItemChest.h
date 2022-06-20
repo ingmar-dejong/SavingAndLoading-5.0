@@ -7,6 +7,8 @@
 #include "SGameplayInterface.h"
 #include "SItemChest.generated.h"
 
+class USAttributeComponent;
+
 UCLASS()
 class SAVINGANDLOADING_API ASItemChest : public AActor, public ISGameplayInterface
 {
@@ -35,5 +37,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* LidMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USAttributeComponent* AttributeComp;
+
+// 	UFUNCTION()
+// 	void OnTimeStateChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, int32 NewState, int32 Delta);
 
 };

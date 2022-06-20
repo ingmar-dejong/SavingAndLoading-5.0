@@ -19,6 +19,8 @@ USAttributeComponent::USAttributeComponent()
 	MaxRage = 100.f;
 	Rage = 0.f;
 
+	TimeState = 1;
+
 	SetIsReplicatedByDefault(true);
 }
 
@@ -60,6 +62,13 @@ float USAttributeComponent::GetRage() const
 {
 	return Rage;
 }
+
+// int32 USAttributeComponent::GetTimeState() const
+// {
+// 	return TimeState;
+// }
+
+
 
 bool USAttributeComponent::ApplyRageChange(AActor* InstigatorActor, float Delta)
 {
@@ -130,6 +139,23 @@ bool USAttributeComponent::ApplyHeatlhChange(AActor* InstigatorActor, float Delt
 	return ActualDelta != 0;
 }
 
+
+
+bool USAttributeComponent::ApplyStateChange(AActor* ApplyActor, UStaticMeshComponent* BaseMesh)
+{
+	if (ApplyActor)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Interacted Tag activated"));
+// 		BaseMesh->SetHiddenInGame(true);
+// 		BaseMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+// 		OnTimeStateChanged.Broadcast(ApplyActor, this);
+		return true;
+	}
+	return false;
+}
+
+
+
 USAttributeComponent* USAttributeComponent::GetAttributes(AActor* FromActor)
 {
 	if (FromActor)
@@ -188,6 +214,8 @@ FHitResult USAttributeComponent::GetAimHitResult(ACharacter* InstigatorCharacter
 	}
 	return ScreenTraceHit;
 }
+
+
 
 void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
 {

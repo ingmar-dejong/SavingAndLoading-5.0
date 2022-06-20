@@ -9,7 +9,7 @@
 #include "AMagicProjectile.generated.h"
 
 class USActionEffect;
-
+class USAction;
 
 
 UCLASS()
@@ -30,6 +30,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<USActionEffect> BurningActionClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<USAction> InteractedClass;
 
 	virtual void PostInitializeComponents() override;
 

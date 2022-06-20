@@ -43,6 +43,7 @@ void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FS
 	Super::InitGame(MapName, Options, ErrorMessage);
 
 	LoadSaveGame();
+
 }
 
 void ASGameModeBase::StartPlay()
@@ -145,6 +146,8 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 
 	if (Locations.Num() > 0) // of gebruik IsValidIndex(0)
 	{
+
+		//Converts FName info from DataTable to actual data.
 		if (MonsterTable)
 		{
 			TArray<FMonsterInfoRow*> Rows;
@@ -178,6 +181,7 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 void ASGameModeBase::OnMonsterLoaded(FPrimaryAssetId LoadedID, FVector SpawnLocation)
 {
 	LogOnScreen(this, "FINISHED Loading.", FColor::Green);
+
 
 	UAssetManager* Manager = UAssetManager::GetIfValid();
 	if (Manager)

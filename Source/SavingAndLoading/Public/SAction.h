@@ -43,11 +43,11 @@ protected:
 	USActionComponent* GetOwningComponent() const;
 
 	// Tags added to owning actor when activated, removed when action stops 
-	UPROPERTY(EditDefaultsOnly, Category = "Tags")
+	UPROPERTY(EditDefaultsOnly, Category = "Tags", SaveGame)
 	FGameplayTagContainer GrantsTags;
 
 	// Action can only starts if OwningActor has none of these tags applied 
-	UPROPERTY(EditDefaultsOnly, Category = "Tags")
+	UPROPERTY(EditDefaultsOnly, Category = "Tags", SaveGame)
 	FGameplayTagContainer BlockedTags;
 
 	UPROPERTY(ReplicatedUsing="OnRep_RepData")

@@ -8,6 +8,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnRageChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewRage, float, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStateChanged, AActor*, ApplyActor, USAttributeComponent*, OwningComp);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SAVINGANDLOADING_API USAttributeComponent : public UActorComponent
@@ -27,6 +28,9 @@ public:
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
+	float TimeState;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated,  Category = "Attributes")
 	float Health;
 
@@ -45,6 +49,7 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRagehChanged(AActor* InstigatorActor, float NewRage, float Delta);
 
+
 	
 
 public:	
@@ -60,6 +65,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHeatlhChange(AActor* InstigatorActor, float Delta);
 
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool ApplyStateChange(AActor* ApplyActor, UStaticMeshComponent* BaseMesh);
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	float GetMaxHealth() const;
@@ -84,4 +91,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnRageChanged OnRageChanged;
+
+ 	UPROPERTY(BlueprintAssignable)
+ 	FOnStateChanged OnTimeStateChanged;
 };

@@ -17,7 +17,7 @@ USActionComponent::USActionComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	SetIsReplicatedByDefault(true);
-
+	
 }
 
 
@@ -34,7 +34,7 @@ void USActionComponent::BeginPlay()
 			AddAction(GetOwner(), ActionClass);
 		}
 	}
-
+ 
 }
 
 
@@ -96,6 +96,10 @@ void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> Acti
 		{
 			NewAction->StartAction(Instigator);
 		}
+// 		if (NewAction->bAutoStart == false && ensure(NewAction->CanStart(Instigator)))
+// 		{
+// 			NewAction->StartAction(Instigator);
+// 		}
 	}
 }
 

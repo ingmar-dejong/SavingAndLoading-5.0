@@ -10,6 +10,7 @@
 #include "SActionComponent.h"
 #include "SPhysicalAnimationComponent.h"
 #include "SActionEffect.h"
+#include "SAction.h"
 
 
 
@@ -50,6 +51,7 @@ void AAMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 
 			if (ActionComp && HasAuthority())
 			{
+				ActionComp->AddAction(GetInstigator(), InteractedClass);
 				ActionComp->AddAction(GetInstigator(), BurningActionClass);
 			}
 		}

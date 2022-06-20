@@ -94,6 +94,7 @@ void ASCharacter::HealSelf(float Amount)
 void ASCharacter::PrimaryAttack()
 {
 	ActionComp->StartActionByName(this, "PrimaryAttack");
+	ActionComp->StartActionByName(this, "Interacted");
 }
 
 
@@ -157,6 +158,7 @@ void ASCharacter::OnRageChanged(AActor* InstigatorActor, USAttributeComponent* O
 		return;
 	}
 }
+
 
 void ASCharacter::SprintStart()
 {
